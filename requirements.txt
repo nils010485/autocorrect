@@ -22,4 +22,3 @@ pynput
 # - pyqt5 (remplacé par PyQt6)
 # - pyqtwebengine (inclus dans PyQt6-WebEngine)
 # - pywebview[qt] (non nécessaire avec PyQt6)
-# pip install pyarmor==7.7.4 | It'll be opensource later I just need to clean the code.

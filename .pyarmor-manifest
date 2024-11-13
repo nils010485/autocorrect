@@ -1,9 +1,0 @@
-# .pyarmor-manifest
-include: main.py
-include: autocorrect_pro/**/*.py
-
-exclude: .venv/**
-exclude: .git/**
-exclude: .idea/**
-exclude: __pycache__/**
-exclude: *.pyc
