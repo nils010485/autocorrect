@@ -1,0 +1,24 @@
+# Web Framework
+Flask==3.0.2
+
+# AI Services
+google-generativeai
+anthropic
+openai
+
+# GUI
+PyQt6
+PyQt6-WebEngine
+PyQt6-Qt6
+
+# Utilities
+pyperclip
+rich
+
+pynput
+# Removed:
+# - pywebview (remplacé par PyQt6)
+# - pyarmor (non utilisé dans le code actuel)
+# - pyqt5 (remplacé par PyQt6)
+# - pyqtwebengine (inclus dans PyQt6-WebEngine)
+# - pywebview[qt] (non nécessaire avec PyQt6)

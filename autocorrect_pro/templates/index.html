@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-AutoCorrect Refresh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+</head>
+<body class="bg-slate-50">
+<!-- Barre latérale -->
+<div id="sidebar"
+     class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform translate-x-full sidebar-transition z-50">
+    <div class="p-6">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-bold text-gray-800">Paramètres</h2>
+            <button id="closeSidebar" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <div class="space-y-6">
+            <!-- Section Clé API -->
+            <!-- Section Clé API -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-key text-indigo-500 mr-2"></i>Clé API
+                </h3>
+                <div class="space-y-4">
+                    <div class="relative">
+                        <input type="password" id="apiKey"
+                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input"
+                               placeholder="Entrez votre clé API">
+                        <button id="toggleApiKey"
+                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Modèle d'IA -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-robot text-indigo-500 mr-2"></i>Modèle d'IA
+                </h3>
+                <select id="modelSelect"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input">
+                    {% for model_id, model_name in models.items() %}
+                        <option value="{{ model_id }}" {% if model_id== current_model %}selected{% endif %}>
+                            {{ model_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-keyboard text-indigo-500 mr-2"></i>Raccourci Clavier
+                </h3>
+                <div class="relative">
+                    <input type="text" id="shortcutInput"
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input"
+                           placeholder="Entrez le raccourci clavier" value="{{ current_shortcut }}">
+                </div>
+            </div>
+
+            <!-- Section Thème -->
+            <div>
+                <h3 class="text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-paint-brush text-indigo-500 mr-2"></i>Thème
+                </h3>
+                <div class="relative">
+                    <select id="themeSelect"
+                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input">
+                        <option value="light">Thème clair</option>
+                        <option value="dark">Thème sombre</option>
+                    </select>
+                </div>
+            </div>
+
+
+            <!-- Bouton de sauvegarde -->
+            <div>
+                <button id="saveApiKey"
+                        class="w-full px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
+                    Sauvegarder la configuration
+                </button>
+            </div>
+            <!-- Bouton de byebye -->
+            <div>
+                <button id="deleteConfig"
+                        class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors mt-4 flex items-center justify-center">
+                    <i class="fas fa-trash-alt mr-2"></i>
+                    Supprimer la configuration
+                </button>
+            </div>
+
+
+            <!-- Section informative -->
+            <div class="border-t pt-6">
+                <p class="text-sm text-gray-600">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    Votre configuration est stockée localement et de manière sécurisée.
+                </p>
+            </div>
+
+            <!-- Section des modèles -->
+            <div class="border-t pt-6">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">À propos des modèles</h3>
+                <div class="space-y-3">
+                    <div class="text-sm text-gray-600">
+                        <i class="fab fa-google text-blue-500 mr-2"></i>
+                        <strong>Gemini:</strong> Modèle de Google, rapide et efficace
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        <i class="fas fa-brain text-green-500 mr-2"></i>
+                        <strong>Claude:</strong> Modèle d'Anthropic, précis et nuancé
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        <i class="fas fa-robot text-purple-500 mr-2"></i>
+                        <strong>GPT-4:</strong> Modèle d'OpenAI, polyvalent
+                    </div>
+                </div>
+                <!-- Dans la div du sidebar, ajoutez ceci à la fin de la div class="space-y-6" -->
+
+                <!-- Section développeur -->
+                <div class="border-t pt-6 mt-6">
+                    <p class="text-sm text-gray-600 text-center">
+                        Développé par
+                        <a href="https://nils.begou.dev"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="text-indigo-600 hover:text-indigo-800 font-medium transition-colors hover:underline">
+                            Nils
+                        </a>
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- En-tête -->
+<header class="fixed top-0 left-0 right-0 bg-white shadow-md z-40">
+    <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-700">
+                <i class="fas fa-wand-magic-sparkles mr-2"></i>AI-AutoCorrect
+            </h1>
+            <button id="openSidebar" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                <i class="fas fa-cog text-gray-600 text-xl"></i>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Contenu principal -->
+<main class="container mx-auto px-4 pt-24 pb-12">
+    <div class="max-w-3xl mx-auto">
+        <!-- Sélection du mode -->
+        <!-- Sélection du mode -->
+        <div class="mb-8 bg-white rounded-xl p-6 shadow-sm" data-aos="fade-up">
+            <div class="flex justify-between items-center mb-4">
+                <label class="text-sm font-medium text-gray-700">Mode de traitement</label>
+                <div class="flex space-x-2">
+                    <button id="prevPage" class="p-2 text-gray-500 hover:text-indigo-600 disabled:text-gray-300">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span id="pageIndicator" class="text-sm text-gray-600">Page <span id="currentPage">1</span>/2</span>
+                    <button id="nextPage" class="p-2 text-gray-500 hover:text-indigo-600">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Page 1 -->
+            <div id="modePage1" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <button class="mode-button p-4 rounded-lg border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all text-center hover-shadow"
+                        data-mode="traduire">
+                    <i class="fas fa-language text-xl mb-2 text-indigo-500"></i>
+                    <div class="text-sm font-medium">Traduire</div>
+                </button>
+                <button class="mode-button p-4 rounded-lg border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all text-center hover-shadow"
+                        data-mode="analyser">
+                    <i class="fas fa-microscope text-xl mb-2 text-indigo-500"></i>
+                    <div class="text-sm font-medium">Analyser</div>
+                </button>
+                <button class="mode-button p-4 rounded-lg border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all text-center hover-shadow"
+                        data-mode="corriger">
+                    <i class="fas fa-spell-check text-xl mb-2 text-indigo-500"></i>
+                    <div class="text-sm font-medium">Corriger</div>
+                </button>
+            </div>
+
+            <!-- Page 2 -->
+            <div id="modePage2" class="grid grid-cols-2 md:grid-cols-3 gap-4 hidden">
+                <button class="mode-button p-4 rounded-lg border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all text-center hover-shadow"
+                        data-mode="professionaliser">
+                    <i class="fas fa-briefcase text-xl mb-2 text-indigo-500"></i>
+                    <div class="text-sm font-medium">Professionaliser</div>
+                </button>
+                <button class="mode-button p-4 rounded-lg border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all text-center hover-shadow"
+                        data-mode="etendre">
+                    <i class="fas fa-expand text-xl mb-2 text-indigo-500"></i>
+                    <div class="text-sm font-medium">Étendre</div>
+                </button>
+                <button class="mode-button p-4 rounded-lg border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all text-center hover-shadow"
+                        data-mode="reformuler">
+                    <i class="fas fa-star text-xl mb-2 text-indigo-500"></i>
+                    <div class="text-sm font-medium">Reformuler</div>
+                </button>
+                <button class="mode-button p-4 rounded-lg border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all text-center hover-shadow"
+                        data-mode="repondre">
+                    <i class="fas fa-reply text-xl mb-2 text-indigo-500"></i>
+                    <div class="text-sm font-medium">Répondre</div>
+                </button>
+            </div>
+
+        </div>
+
+
+        <!-- Zone de texte -->
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-8" data-aos="fade-up" data-aos-delay="100">
+            <label for="input_text" class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-pen-fancy mr-2 text-indigo-400"></i>Texte à traiter
+            </label>
+            <textarea id="input_text" name="input_text" rows="4"
+                      class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 resize-none floating-input"
+                      placeholder="Entrez votre texte ici..."></textarea>
+
+            <button id="submit-btn"
+                    class="mt-4 w-full py-3 px-6 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center shadow-lg hover:shadow-xl">
+                <i class="fas fa-magic mr-2"></i>
+                Traiter le texte
+            </button>
+        </div>
+
+        <!-- Section de réponse -->
+        <div id="response-section" class="bg-white rounded-xl p-6 shadow-sm mb-8 hidden" data-aos="fade-up"
+             data-aos-delay="100">
+            <label for="response_text" class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-reply mr-2 text-indigo-400"></i> Ce que vous voulez répondre
+            </label>
+            <textarea id="response_text" name="response_text" rows="4"
+                      class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 resize-none floating-input"
+                      placeholder="Entrez votre réponse ici..."></textarea>
+        </div>
+
+        <!-- Indicateur de chargement -->
+        <div id="loading" class="hidden">
+            <div class="flex items-center justify-center space-x-4 bg-white rounded-xl p-6 shadow-sm">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+                <span class="text-gray-600">Traitement en cours...</span>
+            </div>
+        </div>
+
+        <!-- Résultat -->
+        <!-- Résultat -->
+        <div id="result" class="hidden bg-white rounded-xl p-6 shadow-sm" data-aos="fade-up" data-aos-delay="200">
+            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                Résultat
+            </h2>
+            <div id="result-text" class="prose max-w-none mb-4 text-gray-700"></div>
+
+            <!-- Boutons Copier et Retour -->
+            <div id="result-buttons" class="hidden flex space-x-4 mt-4">
+                <button id="copy-button"
+                        class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
+                    <i class="fas fa-copy mr-2"></i> Copier
+                </button>
+                <button id="back-button"
+                        class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                    <i class="fas fa-arrow-left mr-2"></i> Retour
+                </button>
+            </div>
+        </div>
+
+    </div>
+</main>
+<input type="hidden" id="selectedMode" name="mode" value="corriger">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+
+<script>
+    // Initialisation AOS
+    AOS.init({
+        duration: 800,
+        once: true,
+        easing: 'ease-out-cubic'
+    });
+
+    // CHARGEMENT DU THEME
+    document.addEventListener('DOMContentLoaded', function () {
+        // Charger le thème sauvegardé
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+        document.getElementById('themeSelect').value = savedTheme;
+
+        // Charger la configuration initiale
+        fetch('/api/config')
+            .then(response => response.json())
+            .then(data => {
+                if (data.theme) {
+                    setTheme(data.theme);
+                    document.getElementById('themeSelect').value = data.theme;
+                }
+                if (data.shortcut) {
+                    document.getElementById('shortcutInput').value = data.shortcut;
+                }
+            });
+
+        const page1 = document.getElementById('modePage1');
+        const page2 = document.getElementById('modePage2');
+        const prevBtn = document.getElementById('prevPage');
+        const nextBtn = document.getElementById('nextPage');
+        const currentPageSpan = document.getElementById('currentPage');
+        let currentPage = 1;
+
+        function updatePageVisibility() {
+            if (currentPage === 1) {
+                page1.classList.remove('hidden');
+                page2.classList.add('hidden');
+                prevBtn.classList.add('disabled');
+                nextBtn.classList.remove('disabled');
+            } else {
+                page1.classList.add('hidden');
+                page2.classList.remove('hidden');
+                prevBtn.classList.remove('disabled');
+                nextBtn.classList.add('disabled');
+            }
+            currentPageSpan.textContent = currentPage;
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePageVisibility();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentPage < 2) {
+                currentPage++;
+                updatePageVisibility();
+            }
+        });
+
+        // Initialisation
+        updatePageVisibility();
+    });
+
+    // Gestion de la barre latérale
+    const sidebar = document.getElementById('sidebar');
+    const openSidebarBtn = document.getElementById('openSidebar');
+    const closeSidebarBtn = document.getElementById('closeSidebar');
+    const apiKeyInput = document.getElementById('apiKey');
+    const toggleApiKeyBtn = document.getElementById('toggleApiKey');
+    const saveApiKeyBtn = document.getElementById('saveApiKey');
+    const shortcutInput = document.getElementById('shortcutInput');
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }
+
+    // Theme ici
+    document.getElementById('themeSelect').addEventListener('change', function () {
+        const theme = this.value;
+        setTheme(theme);
+    });
+
+    openSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.remove('translate-x-full');
+        sidebar.classList.add('translate-x-0');
+
+        // Charger la configuration existante
+        fetch('/api/config')
+            .then(response => response.json())
+            .then(data => {
+                if (data.has_key) {
+                    apiKeyInput.value = data.api_key;
+                }
+                if (data.model) {
+                    document.getElementById('modelSelect').value = data.model;
+                }
+                if (data.theme) {
+                    document.getElementById('themeSelect').value = data.theme;
+                    setTheme(data.theme);
+                }
+                if (data.shortcut) {
+                    shortcutInput.value = data.shortcut;
+                }
+            });
+    });
+
+    closeSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.remove('translate-x-0');
+        sidebar.classList.add('translate-x-full');
+    });
+
+    // Gestion de l'affichage de la clé API
+    toggleApiKeyBtn.addEventListener('click', () => {
+        const type = apiKeyInput.type === 'password' ? 'text' : 'password';
+        apiKeyInput.type = type;
+        toggleApiKeyBtn.innerHTML = `<i class="fas fa-eye${type === 'password' ? '' : '-slash'}"></i>`;
+    });
+
+
+shortcutInput.addEventListener('keydown', (event) => {
+    event.preventDefault(); // Empêche le comportement par défaut
+    const keys = [];
+    if (event.ctrlKey) keys.push('Ctrl');
+    if (event.altKey) keys.push('Alt');
+    if (event.shiftKey) keys.push('Shift');
+    if (event.metaKey) keys.push('Meta');
+    if (event.key && !['Control', 'Alt', 'Shift', 'Meta'].includes(event.key)) {
+        // Gestion spéciale pour la touche espace
+        if (event.key === ' ' || event.key === 'Space') {
+            keys.push('Space');
+        } else {
+            keys.push(event.key.charAt(0).toUpperCase() + event.key.slice(1));
+        }
+    }
+    shortcutInput.value = keys.join('+');
+});
+
+// Sauvegarde de la configuration
+saveApiKeyBtn.addEventListener('click', async () => {
+    const apiKey = apiKeyInput.value.trim();
+    const selectedModel = document.getElementById('modelSelect').value;
+    const selectedTheme = document.getElementById('themeSelect').value;
+    const newShortcut = shortcutInput.value.trim();
+
+    // Récupérer la configuration actuelle depuis le serveur
+    try {
+        const response = await fetch('/api/config');
+        const currentConfig = await response.json();
+        const currentShortcut = currentConfig.shortcut;
+
+        // Normaliser les raccourcis pour la comparaison
+        const normalizeShortcut = (shortcut) => {
+            return shortcut.split('+')
+                .map(key => key.trim())
+                .filter(key => key)
+                .join('+');
+        };
+
+        const normalizedNew = normalizeShortcut(newShortcut);
+        const normalizedCurrent = normalizeShortcut(currentShortcut);
+
+        if (normalizedNew !== normalizedCurrent) {
+            showAlert(
+                'Changement de raccourci',
+                'L\'application va redémarrer pour appliquer le nouveau raccourci.',
+                'info'
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    saveConfig(apiKey, selectedModel, selectedTheme, newShortcut);
+                }
+            });
+        } else {
+            saveConfig(apiKey, selectedModel, selectedTheme, currentShortcut);
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération de la configuration:', error);
+        saveConfig(apiKey, selectedModel, selectedTheme, newShortcut);
+    }
+});
+
+
+
+
+    function saveConfig(apiKey, selectedModel, selectedTheme, newShortcut) {
+        fetch('/api/config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                api_key: apiKey,
+                model: selectedModel,
+                theme: selectedTheme,
+                shortcut: newShortcut
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showSuccessAlert();
+                sidebar.classList.add('translate-x-full');
+
+                // Ajouter une animation de succès
+                saveApiKeyBtn.classList.add('save-success');
+                setTimeout(() => saveApiKeyBtn.classList.remove('save-success'), 2000);
+            } else {
+                showErrorAlert();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Erreur lors de la sauvegarde de la configuration');
+        });
+    }
+
+    // Sélection du mode
+    const modeButtons = document.querySelectorAll('.mode-button');
+    const selectedModeInput = document.getElementById('selectedMode');
+
+    modeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            modeButtons.forEach(btn => btn.classList.remove('border-indigo-500', 'bg-indigo-50'));
+            button.classList.add('border-indigo-500', 'bg-indigo-50');
+            selectedModeInput.value = button.dataset.mode;
+
+            // Afficher ou masquer la section de réponse en fonction du mode
+            if (button.dataset.mode === 'repondre') {
+                document.getElementById('response-section').classList.remove('hidden');
+            } else {
+                document.getElementById('response-section').classList.add('hidden');
+            }
+        });
+    });
+
+    // Traitement du texte
+    const submitBtn = document.getElementById('submit-btn');
+    const loading = document.getElementById('loading');
+    const result = document.getElementById('result');
+    const resultText = document.getElementById('result-text');
+    const copyButton = document.getElementById('copy-button');
+    const inputText = document.getElementById('input_text');
+
+    submitBtn.addEventListener('click', async function (e) {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        loading.classList.remove('hidden');
+        result.classList.add('hidden');
+        resultText.textContent = '';
+
+        const formData = new FormData();
+        formData.append('mode', selectedModeInput.value);
+        formData.append('input_text', inputText.value);
+
+        if (selectedModeInput.value === 'repondre') {
+            const userResponse = document.getElementById('response_text').value;
+            formData.append('user_response', userResponse);
+        }
+
+        try {
+            const response = await fetch('/process', {
+                method: 'POST',
+                body: formData
+            });
+
+            loading.classList.add('hidden');
+            result.classList.remove('hidden');
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullText = '';
+
+            while (true) {
+                const {value, done} = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[END]') {
+                            submitBtn.disabled = false;
+                            AOS.refresh();
+                            document.getElementById('result-buttons').classList.remove('hidden');
+                            return;
+                        }
+                        console.log("Received chunk:", data); // Debug
+                        resultText.textContent = data;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Fetch error:', error);
+            loading.classList.add('hidden');
+            submitBtn.disabled = false;
+            alert('Une erreur est survenue lors du traitement.');
+        }
+    });
+
+    // Gestion du bouton "Retour"
+    document.getElementById('back-button').addEventListener('click', function () {
+        result.classList.add('hidden');
+        document.getElementById('result-buttons').classList.add('hidden');
+        inputText.value = resultText.textContent;
+        inputText.parentElement.classList.remove('hidden');
+    });
+
+    // Copie dans le presse-papiers
+    copyButton.addEventListener('click', function () {
+        const text = resultText.textContent;
+        fetch('/copy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({text: text})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                copyButton.innerHTML = '<i class="fas fa-check mr-2"></i>Copié !';
+                setTimeout(() => {
+                    copyButton.innerHTML = '<i class="fas fa-copy mr-2"></i>Copier';
+                }, 2000);
+            }
+        });
+    });
+
+    // Initialisation au chargement de la page
+    document.addEventListener('DOMContentLoaded', function () {
+        // Activation du mode "corriger" par défaut
+        const defaultModeButton = document.querySelector('[data-mode="corriger"]');
+        if (defaultModeButton) {
+            defaultModeButton.classList.add('border-indigo-500', 'bg-indigo-50');
+        }
+
+        // Ajout de l'indicateur de modèle
+        const modelSelect = document.getElementById('modelSelect');
+        const modelIndicator = document.createElement('div');
+        modelIndicator.className = 'text-sm text-gray-600 mb-4 bg-white rounded-xl p-4 shadow-sm';
+        modelIndicator.innerHTML = `<i class="fas fa-robot mr-2"></i>Modèle actif : <span class="font-medium">${modelSelect.options[modelSelect.selectedIndex].text}</span>`;
+
+        // Insertion après le header et avant la section des modes
+        const modeSection = document.querySelector('.mode-button').closest('.mb-8');
+        modeSection.parentNode.insertBefore(modelIndicator, modeSection);
+
+        // Mise à jour de l'indicateur lors du changement de modèle
+        modelSelect.addEventListener('change', function () {
+            modelIndicator.innerHTML = `<i class="fas fa-robot mr-2"></i>Modèle actif : <span class="font-medium">${this.options[this.selectedIndex].text}</span>`;
+        });
+    });
+
+    // On Alerte JS avec thème
+    function showAlert(title, text, icon, showCancelButton = false) {
+        const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+
+        return Swal.fire({
+            title: title,
+            text: text,
+            icon: icon,
+            showCancelButton: showCancelButton,
+            confirmButtonColor: '#6366f1',
+            cancelButtonColor: '#f87171',
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Annuler',
+            customClass: isDarkTheme ? {
+                popup: 'swal2-dark',
+                title: 'swal2-title-dark',
+                content: 'swal2-content-dark',
+                confirmButton: 'swal2-confirm-dark',
+                cancelButton: 'swal2-cancel-dark'
+            } : {
+                popup: 'swal2-light',
+                title: 'swal2-title-light',
+                content: 'swal2-content-light',
+                confirmButton: 'swal2-confirm-light',
+                cancelButton: 'swal2-cancel-light'
+            }
+        });
+    }
+
+    // Utilisation pour une alerte de succès
+    function showSuccessAlert() {
+        showAlert('Succès', 'Configuration sauvegardée avec succès !', 'success');
+    }
+
+    // Utilisation pour une alerte d'erreur
+    function showErrorAlert() {
+        showAlert('Erreur', 'Erreur lors de la sauvegarde de la configuration', 'error');
+    }
+
+    // Gestion de la suppression de la configuration
+    const deleteConfigBtn = document.getElementById('deleteConfig');
+
+    deleteConfigBtn.addEventListener('click', () => {
+        showAlert(
+            'Êtes-vous sûr ?',
+            "Cela supprimera votre clé API et réinitialisera le modèle.",
+            'warning',
+            true
+        ).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/api/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        api_key: '', // Réinitialiser la clé API
+                        model: 'gemini-1.5-flash' // Réinitialiser au modèle par défaut
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Réinitialiser les champs
+                        apiKeyInput.value = '';
+                        document.getElementById('modelSelect').value = 'gemini-1.5-flash';
+
+                        // Fermer la sidebar
+                        sidebar.classList.add('translate-x-full');
+
+                        // Potentiellement recharger la page pour montrer l'écran de configuration
+                        window.location.reload();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Erreur',
+                            text: 'Erreur lors de la suppression de la configuration',
+                            confirmButtonColor: '#f87171'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erreur',
+                        text: 'Erreur lors de la suppression de la configuration',
+                        confirmButtonColor: '#f87171'
+                    });
+                });
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

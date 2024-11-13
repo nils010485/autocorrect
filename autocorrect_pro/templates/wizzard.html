@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration - AI-AutoCorrect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/wizzard.css') }}"><link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+</head>
+<body>
+    <div class="min-h-screen flex items-center justify-center px-4">
+        <div class="max-w-md w-full space-y-8 theme-card">
+            <!-- Step Counter -->
+            <div class="text-sm theme-text-secondary text-center mb-4">
+                Étape <span id="currentStep">1</span> sur 4
+            </div>
+
+            <!-- Étape 1: Bienvenue -->
+            <div id="step1" class="fade-in">
+                <div class="text-center">
+                    <h1 class="text-3xl font-extrabold text-indigo-600 mb-4">
+                        <i class="fas fa-wand-magic-sparkles mr-2"></i>AI-AutoCorrect
+                    </h1>
+                    <p class="text-lg theme-text-secondary mb-6">Élevez votre écriture avec AI AUTOCORRECT</p>
+
+                    <div class="grid grid-cols-1 gap-4 text-left mb-6">
+                        <div class="flex items-center">
+                            <i class="fas fa-bolt text-indigo-500 mr-3"></i>
+                            <span>Correction intelligente et instantanée</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-cogs text-indigo-500 mr-3"></i>
+                            <span>Compatible avec les plus grands fournisseurs d'IA</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-alt text-indigo-500 mr-3"></i>
+                            <span>Confidentialité assurée</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-key text-indigo-500 mr-3"></i>
+                            <span>Utilisez vos propres clés API</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-sync-alt text-indigo-500 mr-3"></i>
+                            <span>Mises à jour automatiques</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <a href="https://nils.begou.dev/" target="_blank" class="text-indigo-500 hover:underline mr-4">
+                            <i class="fas fa-user-circle"></i> Nils BEGOU
+                        </a>
+                        <a href="https://autocorrect.fieryaura.eu/" target="_blank" class="text-indigo-500 hover:underline">
+                            <i class="fas fa-globe"></i> Site de l'app
+                        </a>
+                    </div>
+
+                    <button onclick="nextStep(2)" class="w-full py-3 px-6 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors">
+                        <i class="fas fa-arrow-right mr-2"></i>Commencer
+                    </button>
+                </div>
+            </div>
+
+            <!-- Étape 2: Choix du thème -->
+            <div id="step2" class="hidden fade-in">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold text-indigo-600 mb-4">Commençons par configurer le thème</h2>
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium theme-text-secondary mb-2">
+                            <i class="fas fa-paint-brush mr-2 text-indigo-400"></i>Thème de l'application
+                        </label>
+                        <select id="themeSelect" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 theme-card">
+                            <option value="light">Thème clair</option>
+                            <option value="dark">Thème sombre</option>
+                        </select>
+                    </div>
+                    <div class="flex justify-between">
+                        <button onclick="prevStep(1)" class="py-2 px-4 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i>Retour
+                        </button>
+                        <button onclick="nextStep(3)" class="py-2 px-4 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors">
+                            <i class="fas fa-arrow-right mr-2"></i>Suivant
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étape 3: Clé API et Sélection du modèle -->
+            <div id="step3" class="hidden fade-in">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold text-indigo-600 mb-4">Configuration de l'IA</h2>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium theme-text-secondary mb-2">
+                            <i class="fas fa-robot mr-2 text-indigo-400"></i>Choisissez votre modèle d'IA
+                        </label>
+                        <select id="modelSelect" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 theme-card">
+                            {% for model_id, model_name in models.items() %}
+                            <option value="{{ model_id }}">{{ model_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium theme-text-secondary mb-2">
+                            <i class="fas fa-key mr-2 text-indigo-400"></i>Entrez votre clé API
+                        </label>
+                        <div class="relative">
+                            <input type="password" id="apiKey" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 theme-card" placeholder="Votre clé API">
+                            <button type="button" id="toggleApiKey" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-6">
+                        <button onclick="prevStep(2)" class="py-2 px-4 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 transition-colors">
+                            <i class="fas fa-arrow-left mr-2"></i>Retour
+                        </button>
+                        <button onclick="validateAndNext()" class="py-2 px-4 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors">
+                            <i class="fas fa-arrow-right mr-2"></i>Suivant
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Étape 4: Finalisation -->
+            <div id="step4" class="hidden fade-in">
+                <div class="text-center">
+                    <h2 class="text-xl font-bold text-indigo-600 mb-4">Finalisation</h2>
+                    <p class="theme-text-secondary mb-6">Vous êtes prêt à améliorer votre écriture !</p>
+                    <button id="submitConfig" class="w-full py-3 px-6 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors">
+                        <i class="fas fa-rocket mr-2"></i>C'est parti
+                    </button>
+                    <button onclick="prevStep(3)" class="mt-4 py-2 px-4 bg-gray-300 text-gray-700 rounded-xl hover:bg-gray-400 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>Retour
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function nextStep(step) {
+            document.querySelectorAll('.fade-in').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step${step}`).classList.remove('hidden');
+            currentStep = step;
+            document.getElementById('currentStep').innerText = currentStep;
+        }
+
+        function prevStep(step) {
+            nextStep(step);
+        }
+
+        function validateAndNext() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) {
+                document.getElementById('apiKey').classList.add('shake');
+                setTimeout(() => {
+                    document.getElementById('apiKey').classList.remove('shake');
+                }, 500);
+                alert('Veuillez entrer une clé API valide.');
+            } else {
+                nextStep(4);
+            }
+        }
+
+        // Fonction pour définir le thème
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        // Charger le thème sauvegardé
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+            document.getElementById('themeSelect').value = savedTheme;
+        });
+
+        // Écouteur pour le changement de thème
+        document.getElementById('themeSelect').addEventListener('change', (e) => {
+            setTheme(e.target.value);
+        });
+
+        // Toggle visibilité clé API
+        const toggleApiKeyBtn = document.getElementById('toggleApiKey');
+        const apiKeyInput = document.getElementById('apiKey');
+
+        toggleApiKeyBtn.addEventListener('click', () => {
+            const type = apiKeyInput.type === 'password' ? 'text' : 'password';
+            apiKeyInput.type = type;
+            toggleApiKeyBtn.innerHTML = `<i class="fas fa-eye${type === 'password' ? '' : '-slash'}"></i>`;
+        });
+
+        // Soumission du formulaire
+        document.getElementById('submitConfig').addEventListener('click', () => {
+            const apiKey = apiKeyInput.value.trim();
+            const selectedModel = document.getElementById('modelSelect').value;
+            const selectedTheme = document.getElementById('themeSelect').value;
+
+            fetch('/api/config', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    api_key: apiKey,
+                    model: selectedModel,
+                    theme: selectedTheme
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Erreur lors de la sauvegarde de la configuration');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erreur lors de la sauvegarde de la configuration');
+            });
+        });
+    </script>
+</body>
+</html>
