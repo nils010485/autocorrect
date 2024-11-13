@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gérer les Modes - AI-AutoCorrect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen" data-theme="light">
+<!-- En-tête -->
+<header class="fixed top-0 left-0 right-0 bg-white shadow-md z-40">
+    <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-indigo-700 flex items-center">
+                <i class="fas fa-chevron-left mr-4 text-xl"></i>
+                <i class="fas fa-wand-magic-sparkles mr-2"></i>Gestion des Modes
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Contenu principal -->
+<main class="container mx-auto px-4 pt-24 pb-12">
+    <div class="max-w-4xl mx-auto">
+        <!-- Liste des modes existants -->
+        <div class="mb-8 bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-xl font-semibold mb-4 flex items-center">
+                <i class="fas fa-list-ul text-indigo-500 mr-2"></i>
+                Modes personnalisés
+            </h2>
+            <div id="modesList" class="space-y-4">
+                <!-- Les modes seront injectés ici via JavaScript -->
+            </div>
+        </div>
+
+        <!-- Formulaire de création -->
+        <form id="customModeForm" class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-xl font-semibold mb-6 flex items-center">
+                <i class="fas fa-plus-circle text-indigo-500 mr-2"></i>
+                Créer un nouveau mode
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Titre -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                        Titre du mode
+                    </label>
+                    <input type="text" id="title" name="title" required
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                           placeholder="Ex: Simplifier">
+                </div>
+
+                <!-- Icône -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Icône
+                    </label>
+                    <div class="grid grid-cols-5 gap-2 p-4 border rounded-lg bg-gray-50">
+                        <div id="iconGrid" class="contents">
+                            <!-- Les icônes seront injectées ici -->
+                        </div>
+                    </div>
+                    <input type="hidden" id="selectedIconInput" name="icon" required>
+                </div>
+            </div>
+
+            <!-- Prompt -->
+            <div class="mt-6">
+                <label for="prompt" class="block text-sm font-medium text-gray-700 mb-2">
+                    Instructions pour l'IA
+                </label>
+                <textarea id="prompt" name="prompt" required rows="6"
+                          class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 resize-none"
+                          placeholder="Rôle : [Définissez le rôle]&#10;Tâche : [Décrivez la tâche]&#10;Instructions :&#10;- [Instruction 1]&#10;- [Instruction 2]&#10;Format de sortie : [Précisez le format]"></textarea>
+            </div>
+
+            <!-- Boutons -->
+            <div class="flex space-x-4 mt-6">
+                <button type="submit"
+                        class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center">
+                    <i class="fas fa-save mr-2"></i>Créer le mode
+                </button>
+                <a href="/"
+                   class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors flex items-center justify-center">
+                    <i class="fas fa-times mr-2"></i>Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<script>
+    // Liste des icônes
+    const icons = [
+        'fa-language', 'fa-spell-check', 'fa-star', 'fa-magic', 'fa-pen',
+        'fa-book', 'fa-comment', 'fa-lightbulb', 'fa-check', 'fa-edit',
+        'fa-compress-alt', 'fa-expand-alt', 'fa-robot', 'fa-brain', 'fa-cog'
+    ];
+
+    // Création de la grille d'icônes
+    const iconGrid = document.getElementById('iconGrid');
+    icons.forEach(icon => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'icon-button p-3 rounded-lg hover:bg-indigo-100 transition-colors';
+        button.innerHTML = `<i class="fas ${icon} text-xl"></i>`;
+        button.dataset.icon = icon;
+        button.onclick = (e) => {
+            e.preventDefault();
+            document.querySelectorAll('.icon-button').forEach(btn =>
+                btn.classList.remove('bg-indigo-100'));
+            button.classList.add('bg-indigo-100');
+            document.getElementById('selectedIconInput').value = icon;
+        };
+        iconGrid.appendChild(button);
+    });
+
+    // Chargement et affichage des modes existants
+    async function loadModes() {
+        try {
+            const response = await fetch('/api/modes');
+            const data = await response.json();
+            const modesList = document.getElementById('modesList');
+            modesList.innerHTML = '';
+
+
+            if (data.custom) {
+                Object.entries(data.custom).forEach(([id, mode]) => {
+                    const modeElement = document.createElement('div');
+                    modeElement.className = 'border rounded-lg hover:bg-gray-50 overflow-hidden mb-4';
+                    modeElement.innerHTML = `
+            <div class="flex items-center justify-between p-4 cursor-pointer mode-header"
+                 onclick="toggleModeDetails('${id}')">
+                <div class="flex items-center">
+                    <i class="fas ${mode.icon} text-xl text-indigo-500 mr-3"></i>
+                    <span class="font-medium">${mode.title}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="editMode('${id}', event)"
+                            class="text-indigo-500 hover:text-indigo-700 p-2">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button onclick="deleteMode('${id}', event)"
+                            class="text-red-500 hover:text-red-700 p-2">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                </div>
+            </div>
+            <div id="mode-details-${id}" class="hidden">
+                <div class="p-4 border-t bg-gray-50">
+                    <div class="mb-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Instructions pour l'IA
+                        </label>
+                        <div class="relative">
+                            <textarea id="prompt-${id}"
+                                      class="w-full px-4 py-2 border rounded-lg bg-white focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 resize-none"
+                                      rows="6"
+                                      readonly
+                            >${mode.prompt}</textarea>
+                            <button onclick="toggleEdit('${id}')"
+                                    class="absolute top-2 right-2 text-indigo-500 hover:text-indigo-700 bg-white rounded-full p-2 shadow-sm">
+                                <i id="edit-icon-${id}" class="fas fa-lock"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-2 mt-4">
+                        <button onclick="cancelEdit('${id}')"
+                                id="cancel-${id}"
+                                class="hidden px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+                            Annuler
+                        </button>
+                        <button onclick="savePrompt('${id}')"
+                                id="save-${id}"
+                                class="hidden px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                            Sauvegarder
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+                    modesList.appendChild(modeElement);
+                });
+            }
+        } catch (error) {
+            console.error('Erreur lors du chargement des modes:', error);
+        }
+    }
+
+    function toggleModeDetails(modeId) {
+        const details = document.getElementById(`mode-details-${modeId}`);
+        const chevron = details.previousElementSibling.querySelector('.fa-chevron-down');
+
+        if (details.classList.contains('hidden')) {
+            details.classList.remove('hidden');
+            chevron.style.transform = 'rotate(180deg)';
+        } else {
+            details.classList.add('hidden');
+            chevron.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    function toggleEdit(modeId) {
+        const textarea = document.getElementById(`prompt-${modeId}`);
+        const editIcon = document.getElementById(`edit-icon-${modeId}`);
+        const saveBtn = document.getElementById(`save-${modeId}`);
+        const cancelBtn = document.getElementById(`cancel-${modeId}`);
+
+        if (textarea.readOnly) {
+            // Activer l'édition
+            textarea.readOnly = false;
+            textarea.classList.add('border-indigo-500');
+            editIcon.classList.remove('fa-lock');
+            editIcon.classList.add('fa-lock-open');
+            saveBtn.classList.remove('hidden');
+            cancelBtn.classList.remove('hidden');
+            // Sauvegarder le contenu original
+            textarea.dataset.original = textarea.value;
+        } else {
+            // Désactiver l'édition
+            textarea.readOnly = true;
+            textarea.classList.remove('border-indigo-500');
+            editIcon.classList.remove('fa-lock-open');
+            editIcon.classList.add('fa-lock');
+            saveBtn.classList.add('hidden');
+            cancelBtn.classList.add('hidden');
+        }
+    }
+
+    function cancelEdit(modeId) {
+        const textarea = document.getElementById(`prompt-${modeId}`);
+        textarea.value = textarea.dataset.original;
+        toggleEdit(modeId);
+    }
+
+    async function savePrompt(modeId) {
+        const textarea = document.getElementById(`prompt-${modeId}`);
+        const newPrompt = textarea.value;
+
+        try {
+            const response = await fetch(`/api/modes/${modeId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    prompt: newPrompt
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Modifications enregistrées',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+                toggleEdit(modeId);
+            } else {
+                throw new Error(data.error || 'Erreur lors de la sauvegarde');
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: error.message
+            });
+        }
+    }
+
+    // Suppression d'un mode
+    async function deleteMode(modeId) {
+        if (event) {
+            event.stopPropagation();
+        }
+        const result = await Swal.fire({
+            title: 'Êtes-vous sûr ?',
+            text: "Cette action est irréversible !",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/api/modes/${modeId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    await loadModes();
+                    Swal.fire('Supprimé !', 'Le mode a été supprimé.', 'success');
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (error) {
+                Swal.fire('Erreur', error.message, 'error');
+            }
+        }
+    }
+
+    // Gestion du formulaire
+    document.getElementById('customModeForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = {
+            title: document.getElementById('title').value,
+            icon: document.getElementById('selectedIconInput').value,
+            prompt: document.getElementById('prompt').value
+        };
+
+        try {
+            const response = await fetch('/api/modes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                await loadModes();
+                this.reset();
+                document.querySelectorAll('.icon-button').forEach(btn =>
+                    btn.classList.remove('bg-indigo-100'));
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Mode créé avec succès !',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                throw new Error(data.error || 'Erreur lors de la création du mode');
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: error.message
+            });
+        }
+    });
+
+    // Charger les modes au chargement de la page
+    loadModes();
+</script>
+</body>
+</html>

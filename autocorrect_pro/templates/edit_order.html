@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Réorganiser les Modes - AI-AutoCorrect</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+<body class="bg-slate-50" data-theme="light">
+<!-- En-tête -->
+<header class="fixed top-0 left-0 right-0 bg-white shadow-md z-40">
+    <div class="container mx-auto px-4 py-4">
+        <div class="flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-indigo-700 flex items-center">
+                <i class="fas fa-chevron-left mr-4 text-xl"></i>
+                <i class="fas fa-sort mr-2"></i>Réorganiser les Modes
+            </a>
+            <button id="saveOrder"
+                    class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                <i class="fas fa-save mr-2"></i>Sauvegarder
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Contenu principal -->
+<main class="container mx-auto px-4 pt-24 pb-12">
+    <div class="max-w-2xl mx-auto">
+        <!-- Instructions -->
+        <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-lg">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-blue-700">
+                        Faites glisser les modes pour modifier leur ordre d'apparition.
+                        Les changements seront appliqués après la sauvegarde.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Liste des modes -->
+        <div id="modesList" class="space-y-2">
+            <!-- Les modes seront injectés ici via JavaScript -->
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+        const modesList = document.getElementById('modesList');
+
+        // Charger les modes
+        try {
+            const response = await fetch('/api/modes');
+            const data = await response.json();
+
+            // Créer les éléments de la liste
+            data.order.forEach((modeId) => {
+                const mode = data.system[modeId] || data.custom[modeId];
+                const isCustomMode = modeId in data.custom; // Vérifie si c'est un mode personnalisé
+                const div = document.createElement('div');
+                div.className = 'bg-white p-4 rounded-lg shadow-sm flex items-center justify-between';
+                div.dataset.id = modeId;
+                div.innerHTML = `
+        <div class="flex items-center">
+            <i class="fas ${mode.icon} text-indigo-500 mr-4"></i>
+            <span class="font-medium">${mode.title}</span>
+        </div>
+        <div class="flex items-center space-x-3">
+            ${isCustomMode ? `
+                <button onclick="deleteMode('${modeId}', event)"
+                        class="text-red-500 hover:text-red-700 transition-colors">
+                    <i class="fas fa-trash"></i>
+                </button>
+            ` : ''}
+            <i class="fas fa-grip-vertical text-gray-400 cursor-move"></i>
+        </div>
+    `;
+                modesList.appendChild(div);
+            });
+
+
+            // Initialiser Sortable
+            new Sortable(modesList, {
+                animation: 150,
+                ghostClass: 'bg-indigo-50'
+            });
+
+        } catch (error) {
+            console.error('Erreur lors du chargement des modes:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Impossible de charger les modes'
+            });
+        }
+
+        // Gestion de la sauvegarde
+        document.getElementById('saveOrder').addEventListener('click', async function () {
+            const newOrder = Array.from(modesList.children).map(el => el.dataset.id);
+
+            try {
+                const response = await fetch('/api/modes', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({order: newOrder})
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Ordre sauvegardé !',
+                        text: 'Les changements ont été appliqués avec succès.',
+                        showConfirmButton: false,
+                        timer: 2000
+                    }).then(() => {
+                        window.location.href = '/';
+                    });
+                } else {
+                    throw new Error(data.error || 'Erreur lors de la sauvegarde');
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: error.message
+                });
+            }
+        });
+    });
+
+
+    async function deleteMode(modeId, event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const result = await Swal.fire({
+            title: 'Êtes-vous sûr ?',
+            text: "Cette action est irréversible !",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/api/modes/${modeId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    // Supprimer l'élément de la liste
+                    const element = document.querySelector(`[data-id="${modeId}"]`);
+                    element.remove();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Supprimé !',
+                        text: 'Le mode a été supprimé.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    throw new Error(data.error || 'Erreur lors de la suppression');
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erreur',
+                    text: error.message
+                });
+            }
+        }
+    }
+</script>
+</body>
+</html>
