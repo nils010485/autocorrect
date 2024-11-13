@@ -33,7 +33,6 @@ def index():
             ordered_modes[mode_id] = modes_config['system'][mode_id]
         elif mode_id in modes_config.get('custom', {}):
             ordered_modes[mode_id] = modes_config['custom'][mode_id]
-    print(ordered_modes)
     return render_template('index.html',
                            modes=ordered_modes,  # Passer un dictionnaire
                            models={k: v["name"] for k, v in AVAILABLE_MODELS.items()},
@@ -147,13 +146,17 @@ def set_config():
 @bp.route('/custom-mode', methods=['GET'])
 def custom_mode_page():
     """Page de création de mode personnalisé."""
-    return render_template('custom_mode.html')
+    config = load_config()
+    return render_template('custom_mode.html',
+                         current_theme=config.get('theme', 'light'))
 
 
 @bp.route('/edit-order', methods=['GET'])
 def edit_order_page():
     """Page d'édition de l'ordre des modes."""
-    return render_template('edit_order.html')
+    config = load_config()
+    return render_template('edit_order.html',
+                         current_theme=config.get('theme', 'light'))
 
 
 @bp.route('/api/modes', methods=['GET', 'POST', 'PUT'])
