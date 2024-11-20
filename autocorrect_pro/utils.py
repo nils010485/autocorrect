@@ -6,8 +6,40 @@ from typing import Dict, Optional
 from rich.console import Console
 from .config import CONFIG_FILE, CONFIG_DIR, DEFAULT_CONFIG, CUSTOM_MODES_SCHEMA, \
     MODES
+from typing import Tuple
 
 console = Console()
+
+
+def validate_audio_file(file_path: str) -> Tuple[bool, str]:
+    """
+    Valide un fichier audio.
+
+    Args:
+        file_path: Chemin vers le fichier audio
+
+    Returns:
+        Tuple[bool, str]: (est_valide, message_erreur)
+    """
+    # Extensions autorisées
+    ALLOWED_EXTENSIONS = {'flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm'}
+    MAX_SIZE_MB = 25
+
+    # Vérifier si le fichier existe
+    if not os.path.exists(file_path):
+        return False, "Fichier audio non trouvé."
+
+    # Vérifier l'extension
+    extension = os.path.basename(file_path).lower().split('.')[-1]
+    if extension not in ALLOWED_EXTENSIONS:
+        return False, f"Format de fichier non supporté. Formats acceptés: {', '.join(ALLOWED_EXTENSIONS)}"
+
+    # Vérifier la taille
+    file_size_mb = os.path.getsize(file_path) / (1024 * 1024)  # Convertir en MB
+    if file_size_mb > MAX_SIZE_MB:
+        return False, f"Le fichier est trop volumineux. Taille maximale: {MAX_SIZE_MB}MB"
+
+    return True, ""
 
 def find_free_port() -> int:
     """Trouve un port disponible sur le système."""

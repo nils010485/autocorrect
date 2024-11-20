@@ -45,28 +45,28 @@
             </div>
 
             <div>
-    <h3 class="text-sm font-medium text-gray-700 mb-2">
-        <i class="fas fa-robot text-indigo-500 mr-2"></i>Modèle d'IA
-    </h3>
-    <select id="modelSelect"
-            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input">
-        {% for model_id, model_info in models.items() %}
-        <option value="{{ model_id }}" {% if model_id == current_model %}selected{% endif %}>
-            {{ model_info.name }}
-        </option>
-        {% endfor %}
-    </select>
+                <h3 class="text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-robot text-indigo-500 mr-2"></i>Modèle d'IA
+                </h3>
+                <select id="modelSelect"
+                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input">
+                    {% for model_id, model_info in models.items() %}
+                        <option value="{{ model_id }}" {% if model_id == current_model %}selected{% endif %}>
+                            {{ model_info.name }}
+                        </option>
+                    {% endfor %}
+                </select>
 
-    <!-- Configuration endpoint personnalisé -->
-    <div id="customEndpointConfig" class="mt-4 hidden">
-        <input type="text" id="customEndpointUrl"
-               class="w-full px-4 py-2 mb-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-               placeholder="URL de l'endpoint (ex: http://127.0.0.1:9090/v1)">
-        <input type="text" id="customEndpointModel"
-               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-               placeholder="Nom du modèle">
-    </div>
-</div>
+                <!-- Configuration endpoint personnalisé -->
+                <div id="customEndpointConfig" class="mt-4 hidden">
+                    <input type="text" id="customEndpointUrl"
+                           class="w-full px-4 py-2 mb-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                           placeholder="URL de l'endpoint (ex: http://127.0.0.1:9090/v1)">
+                    <input type="text" id="customEndpointModel"
+                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                           placeholder="Nom du modèle">
+                </div>
+            </div>
 
             <div>
                 <h3 class="text-sm font-medium text-gray-700 mb-2">
@@ -202,29 +202,30 @@
             </div>
 
             <!-- Page 1 -->
-                <div id="modesContainer">
-        {% set modes_per_page = 3 %}
-        {% set total_modes = modes|length %}
-        {% set total_pages = ((total_modes - 1) // modes_per_page) + 1 %}
+            <div id="modesContainer">
+                {% set modes_per_page = 3 %}
+                {% set total_modes = modes|length %}
+                {% set total_pages = ((total_modes - 1) // modes_per_page) + 1 %}
 
-        {% for page in range(total_pages) %}
-        <div id="modePage{{ page + 1 }}" class="grid grid-cols-2 md:grid-cols-3 gap-4 {% if page != 0 %}hidden{% endif %}">
-            {% for mode_id, mode in modes.items() %}
-                {% if loop.index0 // modes_per_page == page %}
-                <button class="mode-button p-4 rounded-lg border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all text-center hover-shadow"
-                        data-mode="{{ mode_id }}">
-                    <i class="fas {{ mode.icon }} text-xl mb-2 text-indigo-500"></i>
-                    <div class="text-sm font-medium">{{ mode.title }}</div>
-                </button>
-                {% endif %}
-            {% endfor %}
-        </div>
-        {% endfor %}
+                {% for page in range(total_pages) %}
+                    <div id="modePage{{ page + 1 }}"
+                         class="grid grid-cols-2 md:grid-cols-3 gap-4 {% if page != 0 %}hidden{% endif %}">
+                        {% for mode_id, mode in modes.items() %}
+                            {% if loop.index0 // modes_per_page == page %}
+                                <button class="mode-button p-4 rounded-lg border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all text-center hover-shadow"
+                                        data-mode="{{ mode_id }}">
+                                    <i class="fas {{ mode.icon }} text-xl mb-2 text-indigo-500"></i>
+                                    <div class="text-sm font-medium">{{ mode.title }}</div>
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
 
-        <script>
-            document.getElementById('totalPages').textContent = '{{ total_pages }}';
-        </script>
-    </div>
+                <script>
+                    document.getElementById('totalPages').textContent = '{{ total_pages }}';
+                </script>
+            </div>
 
         </div>
 
@@ -234,10 +235,23 @@
             <label for="input_text" class="block text-sm font-medium text-gray-700 mb-2">
                 <i class="fas fa-pen-fancy mr-2 text-indigo-400"></i>Texte à traiter
             </label>
-            <textarea id="input_text" name="input_text" rows="4"
-                      class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 resize-none floating-input"
-                      placeholder="Entrez votre texte ici..."></textarea>
+            <div class="relative">
+    <textarea id="input_text" name="input_text" rows="4"
+              class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 resize-none floating-input"
+              placeholder="Entrez votre texte ici..."></textarea>
+                <button id="microphone-btn"
+                        class="absolute right-3 top-3 p-2 text-gray-500 hover:text-indigo-600 transition-colors"
+                        title="Transcrire un fichier audio">
+                    <i class="fas fa-microphone"></i>
+                </button>
 
+                <!-- Input file caché -->
+                <input type="file"
+                       id="audio-file"
+                       accept="audio/*"
+                       class="hidden"
+                       onChange="handleAudioFile(this)">
+            </div>
             <button id="submit-btn"
                     class="mt-4 w-full py-3 px-6 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center shadow-lg hover:shadow-xl">
                 <i class="fas fa-magic mr-2"></i>
@@ -325,34 +339,34 @@
 
         let currentPage = 1;
 
-         function updatePageVisibility() {
-        pages.forEach(page => page.classList.add('hidden'));
-        document.getElementById(`modePage${currentPage}`).classList.remove('hidden');
-        document.getElementById('currentPage').textContent = currentPage;
-    }
+        function updatePageVisibility() {
+            pages.forEach(page => page.classList.add('hidden'));
+            document.getElementById(`modePage${currentPage}`).classList.remove('hidden');
+            document.getElementById('currentPage').textContent = currentPage;
+        }
 
-    document.getElementById('prevPage').addEventListener('click', () => {
-        currentPage = currentPage === 1 ? totalPages : currentPage - 1;
-        updatePageVisibility();
-    });
+        document.getElementById('prevPage').addEventListener('click', () => {
+            currentPage = currentPage === 1 ? totalPages : currentPage - 1;
+            updatePageVisibility();
+        });
 
-    document.getElementById('nextPage').addEventListener('click', () => {
-        currentPage = currentPage === totalPages ? 1 : currentPage + 1;
-        updatePageVisibility();
-    });
+        document.getElementById('nextPage').addEventListener('click', () => {
+            currentPage = currentPage === totalPages ? 1 : currentPage + 1;
+            updatePageVisibility();
+        });
 
         // Initialisation
         updatePageVisibility();
     });
     // Custom endpoint
-    document.getElementById('modelSelect').addEventListener('change', function() {
-    const customEndpointConfig = document.getElementById('customEndpointConfig');
-    if (this.value === 'custom') {
-        customEndpointConfig.classList.remove('hidden');
-    } else {
-        customEndpointConfig.classList.add('hidden');
-    }
-});
+    document.getElementById('modelSelect').addEventListener('change', function () {
+        const customEndpointConfig = document.getElementById('customEndpointConfig');
+        if (this.value === 'custom') {
+            customEndpointConfig.classList.remove('hidden');
+        } else {
+            customEndpointConfig.classList.add('hidden');
+        }
+    });
 
     // Gestion de la barre latérale
     const sidebar = document.getElementById('sidebar');
@@ -374,42 +388,42 @@
         setTheme(theme);
     });
 
-// Dans la partie où on charge la configuration existante
-openSidebarBtn.addEventListener('click', () => {
-    sidebar.classList.remove('translate-x-full');
-    sidebar.classList.add('translate-x-0');
+    // Dans la partie où on charge la configuration existante
+    openSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.remove('translate-x-full');
+        sidebar.classList.add('translate-x-0');
 
-    // Charger la configuration existante
-    fetch('/api/config')
-        .then(response => response.json())
-        .then(data => {
-            if (data.has_key) {
-                apiKeyInput.value = data.api_key;
-            }
-            if (data.model) {
-                document.getElementById('modelSelect').value = data.model;
-                // Afficher/masquer les champs d'endpoint personnalisé si nécessaire
-                const customEndpointConfig = document.getElementById('customEndpointConfig');
-                if (data.model === 'custom') {
-                    customEndpointConfig.classList.remove('hidden');
-                    // Remplir les champs avec les valeurs sauvegardées
-                    if (data.custom_endpoint) {
-                        document.getElementById('customEndpointUrl').value = data.custom_endpoint.url || '';
-                        document.getElementById('customEndpointModel').value = data.custom_endpoint.model_name || '';
-                    }
-                } else {
-                    customEndpointConfig.classList.add('hidden');
+        // Charger la configuration existante
+        fetch('/api/config')
+            .then(response => response.json())
+            .then(data => {
+                if (data.has_key) {
+                    apiKeyInput.value = data.api_key;
                 }
-            }
-            if (data.theme) {
-                document.getElementById('themeSelect').value = data.theme;
-                setTheme(data.theme);
-            }
-            if (data.shortcut) {
-                shortcutInput.value = data.shortcut;
-            }
-        });
-});
+                if (data.model) {
+                    document.getElementById('modelSelect').value = data.model;
+                    // Afficher/masquer les champs d'endpoint personnalisé si nécessaire
+                    const customEndpointConfig = document.getElementById('customEndpointConfig');
+                    if (data.model === 'custom') {
+                        customEndpointConfig.classList.remove('hidden');
+                        // Remplir les champs avec les valeurs sauvegardées
+                        if (data.custom_endpoint) {
+                            document.getElementById('customEndpointUrl').value = data.custom_endpoint.url || '';
+                            document.getElementById('customEndpointModel').value = data.custom_endpoint.model_name || '';
+                        }
+                    } else {
+                        customEndpointConfig.classList.add('hidden');
+                    }
+                }
+                if (data.theme) {
+                    document.getElementById('themeSelect').value = data.theme;
+                    setTheme(data.theme);
+                }
+                if (data.shortcut) {
+                    shortcutInput.value = data.shortcut;
+                }
+            });
+    });
 
 
     closeSidebarBtn.addEventListener('click', () => {
@@ -485,40 +499,40 @@ openSidebarBtn.addEventListener('click', () => {
         }
     });
 
-function saveConfig(apiKey, selectedModel, selectedTheme, newShortcut) {
-    const config = {
-        api_key: apiKey,
-        model: selectedModel,
-        theme: selectedTheme,
-        shortcut: newShortcut
-    };
+    function saveConfig(apiKey, selectedModel, selectedTheme, newShortcut) {
+        const config = {
+            api_key: apiKey,
+            model: selectedModel,
+            theme: selectedTheme,
+            shortcut: newShortcut
+        };
 
-    if (selectedModel === 'custom') {
-        config.custom_endpoint_url = document.getElementById('customEndpointUrl').value;
-        config.custom_endpoint_model = document.getElementById('customEndpointModel').value;
-    }
-
-    fetch('/api/config', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(config)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showSuccessAlert();
-            sidebar.classList.add('translate-x-full');
-        } else {
-            showErrorAlert();
+        if (selectedModel === 'custom') {
+            config.custom_endpoint_url = document.getElementById('customEndpointUrl').value;
+            config.custom_endpoint_model = document.getElementById('customEndpointModel').value;
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showErrorAlert();
-    });
-}
+
+        fetch('/api/config', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(config)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessAlert();
+                    sidebar.classList.add('translate-x-full');
+                } else {
+                    showErrorAlert();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorAlert();
+            });
+    }
 
     // Sélection du mode
     const modeButtons = document.querySelectorAll('.mode-button');
@@ -696,6 +710,77 @@ function saveConfig(apiKey, selectedModel, selectedTheme, newShortcut) {
     function showErrorAlert() {
         showAlert('Erreur', 'Erreur lors de la sauvegarde de la configuration', 'error');
     }
+
+    document.getElementById('microphone-btn').addEventListener('click', function() {
+    // Vérifier d'abord si on utilise OpenAI
+    const modelSelect = document.getElementById('modelSelect');
+    const selectedProvider = modelSelect.options[modelSelect.selectedIndex].value;
+
+    if (!selectedProvider.includes('gpt') && selectedProvider !== 'custom') {
+        showAlert(
+            'Fonctionnalité non disponible',
+            'La transcription audio nécessite une clé API OpenAI.',
+            'warning'
+        );
+        return;
+    }
+
+    document.getElementById('audio-file').click();
+});
+
+function handleAudioFile(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+
+        // Créer un FormData pour envoyer le fichier
+        const formData = new FormData();
+        formData.append('audio', file);
+
+        // Montrer un indicateur de chargement
+        Swal.fire({
+            title: 'Transcription en cours',
+            text: 'Veuillez patienter pendant la transcription du fichier audio...',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        // Envoyer le fichier au serveur
+        fetch('/transcribe', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            Swal.close();
+            if (data.success) {
+                document.getElementById('input_text').value = data.text;
+                showAlert(
+                    'Succès',
+                    'Transcription terminée !',
+                    'success'
+                );
+            } else {
+                showAlert(
+                    'Erreur',
+                    data.error || 'Erreur lors de la transcription',
+                    'error'
+                );
+            }
+        })
+        .catch(error => {
+            Swal.close();
+            showAlert(
+                'Erreur',
+                'Erreur lors de la transcription: ' + error,
+                'error'
+            );
+        });
+    }
+}
 
     // Gestion de la suppression de la configuration
     const deleteConfigBtn = document.getElementById('deleteConfig');
