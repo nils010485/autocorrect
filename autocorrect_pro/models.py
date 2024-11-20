@@ -3,7 +3,8 @@ import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import anthropic
 from openai import OpenAI
-from .config import MODES, AVAILABLE_MODELS
+from .config import AVAILABLE_MODELS
+from .utils import load_config
 
 def stream_response(mode_name: str, input_text: str, user_response: Optional[str] = None,
                     model: str = "gemini-1.5-flash", api_key: Optional[str] = None,
@@ -13,6 +14,8 @@ def stream_response(mode_name: str, input_text: str, user_response: Optional[str
     if not api_key:
         yield "Erreur: Clé API non configurée"
         return
+
+    config = load_config()
 
     # Utiliser all_modes au lieu de MODES
     mode_config = all_modes.get(mode_name)

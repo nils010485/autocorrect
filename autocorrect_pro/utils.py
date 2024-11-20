@@ -4,7 +4,7 @@ import sys
 import os
 from typing import Dict, Optional
 from rich.console import Console
-from .config import CONFIG_FILE, CONFIG_DIR, DEFAULT_CONFIG, CURRENT_VERSION, DEFAULT_SHORTCUT, CUSTOM_MODES_SCHEMA, \
+from .config import CONFIG_FILE, CONFIG_DIR, DEFAULT_CONFIG, CUSTOM_MODES_SCHEMA, \
     MODES
 
 console = Console()

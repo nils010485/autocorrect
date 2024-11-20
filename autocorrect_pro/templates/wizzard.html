@@ -342,12 +342,10 @@ document.getElementById('submitConfig').addEventListener('click', () => {
         shortcut: shortcut
     };
 
-    // Ajouter les informations d'endpoint personnalisé si nécessaire
+    // Utiliser la même structure que dans index.html
     if (selectedModel === 'custom') {
-        config.custom_endpoint = {
-            url: document.getElementById('customEndpointUrl').value.trim(),
-            model_name: document.getElementById('customEndpointModel').value.trim()
-        };
+        config.custom_endpoint_url = document.getElementById('customEndpointUrl').value.trim();
+        config.custom_endpoint_model = document.getElementById('customEndpointModel').value.trim();
     }
 
     fetch('/api/config', {
@@ -370,6 +368,9 @@ document.getElementById('submitConfig').addEventListener('click', () => {
         alert('Erreur lors de la sauvegarde de la configuration');
     });
 });
+
+
+
 
 </script>
 </body>

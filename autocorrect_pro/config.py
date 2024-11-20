@@ -15,7 +15,7 @@ CONFIG_FILE = CONFIG_DIR / "gemini.json"
 ICON_PATH = Path(__file__).resolve().parent / 'templates' / 'faveicon.ico'
 
 # Configuration générale
-CURRENT_VERSION = 6
+CURRENT_VERSION = 7
 DEFAULT_SHORTCUT = "Ctrl+Space"
 
 # Configuration des modèles AI

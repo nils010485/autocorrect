@@ -123,6 +123,8 @@ def set_config():
         'model_name': data.get('custom_endpoint_model', '').strip()
     }
 
+
+
     current_config = load_config()
     current_shortcut = current_config.get('shortcut', DEFAULT_SHORTCUT)
 
@@ -130,6 +132,7 @@ def set_config():
         try:
             if CONFIG_FILE.exists():
                 CONFIG_FILE.unlink()
+            restart_application()
             return jsonify({'success': True})
         except Exception as e:
             return jsonify({
@@ -144,6 +147,7 @@ def set_config():
             last_version=CURRENT_VERSION,
             shortcut=new_shortcut,
             custom_endpoint=custom_endpoint
+
     ):
         if new_shortcut != current_shortcut:
             restart_application()

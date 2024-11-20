@@ -43,65 +43,76 @@
     </style>
 </head>
 <body>
-    <div class="min-h-screen flex items-center justify-center px-4">
-        <div class="max-w-md w-full space-y-8 theme-card p-8 rounded-xl shadow-lg">
-            <!-- En-tête -->
-            <div class="text-center">
-                <h1 class="text-2xl font-bold text-indigo-600 flex items-center justify-center">
-                    <i class="fas fa-bell mr-2"></i>Quoi de neuf ?
-                </h1>
-                <p class="mt-2 theme-text-secondary">Découvrez les dernières améliorations et fonctionnalités de la version 1.1.0</p>
-            </div>
-
-            <!-- Liste des nouveautés -->
-            <ul class="space-y-4 theme-text-secondary">
-                <li class="flex items-start">
-                    <i class="fas fa-code text-indigo-500 mr-3"></i>
-                    <span>Refactor de l'application</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fas fa-sort text-indigo-500 mr-3"></i>
-                    <span>L'ordre des boutons est maintenant personnalisable</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fas fa-cogs text-indigo-500 mr-3"></i>
-                    <span>Vous pouvez maintenant créer vos propres modes de traitement</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fas fa-keyboard text-indigo-500 mr-3"></i>
-                    <span>Si un raccourci est invalide, l'application remettra le raccourci par défaut</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fas fa-tachometer-alt text-indigo-500 mr-3"></i>
-                    <span>Optimisation des performances</span>
-                </li>
-                <li class="flex items-start">
-                    <i class="fas fa-star text-indigo-500 mr-3"></i>
-                    <span>Le code est maintenant sur GitHub !</span>
-                </li>
-            </ul>
-
-            <!-- Bouton pour continuer -->
-            <button onclick="window.location.href='/'"
-                    class="w-full py-3 px-6 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors flex items-center justify-center mt-6">
-                <i class="fas fa-arrow-right mr-2"></i>
-                Continuer
-            </button>
+<div class="min-h-screen flex items-center justify-center px-4">
+    <div class="max-w-md w-full space-y-8 theme-card p-8 rounded-xl shadow-lg">
+        <!-- En-tête -->
+        <div class="text-center">
+            <h1 class="text-2xl font-bold text-indigo-600 flex items-center justify-center">
+                <i class="fas fa-bell mr-2"></i>Quoi de neuf ?
+            </h1>
+            <p class="mt-2 theme-text-secondary">Découvrez les dernières améliorations et fonctionnalités de la version
+                1.1.0</p>
         </div>
+
+        <!-- Liste des nouveautés -->
+        <!-- Liste des nouveautés -->
+        <ul class="space-y-4 theme-text-secondary">
+            <li class="flex items-start">
+                <i class="fas fa-code text-indigo-500 mr-3"></i>
+                <span>Refactor de l'application</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-sort text-indigo-500 mr-3"></i>
+                <span>L'ordre des boutons est maintenant personnalisable</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-cogs text-indigo-500 mr-3"></i>
+                <span>Vous pouvez maintenant créer vos propres modes de traitement</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-keyboard text-indigo-500 mr-3"></i>
+                <span>Si un raccourci est invalide, l'application remettra le raccourci par défaut</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-tachometer-alt text-indigo-500 mr-3"></i>
+                <span>Optimisation des performances</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-laptop-code text-indigo-500 mr-3"></i>
+                <span>Ajout du support des modèles locaux</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-bug text-indigo-500 mr-3"></i>
+                <span>Correction de bugs mineurs</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-star text-indigo-500 mr-3"></i>
+                <span>Le code est maintenant sur GitHub !</span>
+            </li>
+        </ul>
+
+
+        <!-- Bouton pour continuer -->
+        <button onclick="window.location.href='/'"
+                class="w-full py-3 px-6 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors flex items-center justify-center mt-6">
+            <i class="fas fa-arrow-right mr-2"></i>
+            Continuer
+        </button>
     </div>
+</div>
 
-    <script>
-        // Fonction pour définir le thème
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-        }
+<script>
+    // Fonction pour définir le thème
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }
 
-        // Charger le thème sauvegardé
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            setTheme(savedTheme);
-        });
-    </script>
+    // Charger le thème sauvegardé
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        setTheme(savedTheme);
+    });
+</script>
 </body>
 </html>
