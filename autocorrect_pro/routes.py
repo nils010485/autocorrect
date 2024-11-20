@@ -1,9 +1,14 @@
+import os
+import tempfile
+
 from flask import Blueprint, render_template, request, jsonify, Response
 import pyperclip
+from openai import OpenAI
+
 from .config import MODES, AVAILABLE_MODELS, CURRENT_VERSION, DEFAULT_SHORTCUT, CONFIG_FILE
 from .utils import load_config, save_config, restart_application, load_modes
 from .models import stream_response
-
+from .utils import validate_audio_file
 bp = Blueprint('main', __name__)
 
 
@@ -88,6 +93,80 @@ def copy():
         return jsonify({'success': True})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
+
+
+@bp.route('/transcribe', methods=['POST'])
+def transcribe():
+    """Transcrit un fichier audio en texte via OpenAI Whisper."""
+    temp_file = None
+    try:
+        if 'audio' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'Aucun fichier audio fourni.'
+            }), 400
+
+        audio_file = request.files['audio']
+        if audio_file.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'Aucun fichier sélectionné.'
+            }), 400
+
+        config = load_config()
+
+        if not config.get('api_key') or AVAILABLE_MODELS.get(config.get('model', '')).get('provider') != 'openai':
+            return jsonify({
+                'success': False,
+                'error': 'Une clé API OpenAI est requise pour la transcription audio.'
+            }), 400
+
+        # Créer un fichier temporaire avec la bonne extension
+        temp_file = tempfile.NamedTemporaryFile(suffix=os.path.splitext(audio_file.filename)[1], delete=False)
+        audio_file.save(temp_file.name)
+
+        # Valider le fichier
+        is_valid, error_message = validate_audio_file(temp_file.name)
+        if not is_valid:
+            return jsonify({
+                'success': False,
+                'error': error_message
+            }), 400
+
+        try:
+            client = OpenAI(api_key=config.get('api_key'))
+            # Réouvrir le fichier en mode binaire
+            with open(temp_file.name, "rb") as audio:
+                transcription = client.audio.transcriptions.create(
+                    model="whisper-1",
+                    file=audio,
+                    response_format="text"
+                )
+
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'error': f"Erreur lors de la transcription, essayez un autre format."
+            }), 500
+
+        return jsonify({
+            'success': True,
+            'text': transcription
+        })
+
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': f"Erreur inattendue: {str(e)}"
+        }), 500
+    finally:
+        # Nettoyage du fichier temporaire
+        if temp_file:
+            temp_file.close()
+            try:
+                os.unlink(temp_file.name)
+            except:
+                pass
 
 
 @bp.route('/api/config', methods=['GET'])

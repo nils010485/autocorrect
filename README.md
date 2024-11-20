@@ -17,6 +17,7 @@ Imaginez avoir un assistant personnel qui :
 - ✍️ Reformule vos idées pour qu'elles brillent
 - 🎩 Transforme vos brouillons en textes professionnels
 - 💡 Analyse et améliore votre style d'écriture
+- 🎤 Transcris tous vos audios en un clin d'œil
 
 ## 🛠️ Comment ça marche ?
 
@@ -24,6 +25,7 @@ AI AUTOCORRECT s'appuie sur les meilleurs modèles d'IA du marché :
 - 🧠 **Google Gemini** (gratuit !)
 - 🎯 **Anthropic Claude**
 - ⚡ **OpenAI GPT**
+- 🌬️ **Modèles locaux**
 
 Le plus cool ? Vous gardez le contrôle total avec vos propres clés API !
 
