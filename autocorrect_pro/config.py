@@ -15,7 +15,7 @@ CONFIG_FILE = CONFIG_DIR / "gemini.json"
 ICON_PATH = Path(__file__).resolve().parent / 'templates' / 'faveicon.ico'
 
 # Configuration générale
-CURRENT_VERSION = 6
+CURRENT_VERSION = 7
 DEFAULT_SHORTCUT = "Ctrl+Space"
 
 # Configuration des modèles AI
@@ -34,6 +34,11 @@ AVAILABLE_MODELS = {
         "name": "Anthropic Claude3.5 Haiku",
         "provider": "anthropic",
         "model_name": "claude-3-5-haiku-latest"
+    },
+    "custom": {
+        "name": "Autre modèle",
+        "provider": "custom",
+        "configurable": True
     }
 }
 
@@ -182,12 +187,16 @@ Texte à résumer :""",
 }
 
 
-DEFAULT_CONFIG: Dict = {
+DEFAULT_CONFIG = {
     'api_key': None,
     'model': 'gemini-1.5-flash',
     'theme': 'light',
     'last_version': 1,
-    'shortcut': DEFAULT_SHORTCUT
+    'shortcut': DEFAULT_SHORTCUT,
+    'custom_endpoint': {
+        'url': '',
+        'model_name': ''
+    }
 }
 
 CUSTOM_MODES_SCHEMA = {

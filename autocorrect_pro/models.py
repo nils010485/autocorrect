@@ -3,7 +3,8 @@ import google.generativeai as genai
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import anthropic
 from openai import OpenAI
-from .config import MODES, AVAILABLE_MODELS
+from .config import AVAILABLE_MODELS
+from .utils import load_config
 
 def stream_response(mode_name: str, input_text: str, user_response: Optional[str] = None,
                     model: str = "gemini-1.5-flash", api_key: Optional[str] = None,
@@ -13,6 +14,8 @@ def stream_response(mode_name: str, input_text: str, user_response: Optional[str
     if not api_key:
         yield "Erreur: Clé API non configurée"
         return
+
+    config = load_config()
 
     # Utiliser all_modes au lieu de MODES
     mode_config = all_modes.get(mode_name)
@@ -45,6 +48,17 @@ def stream_response(mode_name: str, input_text: str, user_response: Optional[str
             yield from _stream_openai(full_prompt, api_key, model_config["model_name"])
         elif model_config["provider"] == "anthropic":
             yield from _stream_anthropic(full_prompt, api_key, model_config["model_name"])
+        elif model_config["provider"] == "custom":
+            custom_endpoint = config.get('custom_endpoint', {})
+            if not custom_endpoint.get('url') or not custom_endpoint.get('model_name'):
+                yield "Erreur: Configuration de l'endpoint personnalisé incomplète"
+                return
+            yield from _stream_custom_openai(
+                full_prompt,
+                api_key,
+                custom_endpoint['model_name'],
+                custom_endpoint['url']
+            )
         else:
             yield f"Erreur: Fournisseur non supporté pour le modèle {model}"
 
@@ -70,6 +84,18 @@ def _stream_gemini(prompt: str, api_key: str) -> Generator[str, None, None]:
 def _stream_openai(prompt: str, api_key: str, model_name: str) -> Generator[str, None, None]:
     """Gère le streaming pour les modèles OpenAI."""
     client = OpenAI(api_key=api_key)
+    response = client.chat.completions.create(
+        model=model_name,
+        messages=[{"role": "user", "content": prompt}],
+        stream=True
+    )
+    for chunk in response:
+        if chunk.choices[0].delta.content:
+            yield chunk.choices[0].delta.content
+
+def _stream_custom_openai(prompt: str, api_key: str, model_name: str, base_url: str) -> Generator[str, None, None]:
+    """Gère le streaming pour les modèles OpenAI-like personnalisés."""
+    client = OpenAI(api_key=api_key, base_url=base_url)
     response = client.chat.completions.create(
         model=model_name,
         messages=[{"role": "user", "content": prompt}],
