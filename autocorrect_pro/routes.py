@@ -21,9 +21,9 @@ def index():
     # Vérifier si la clé API est présente
     if not config.get('api_key'):
         return render_template('wizzard.html',
-                               models={k: v["name"] for k, v in AVAILABLE_MODELS.items()})
+                               models=AVAILABLE_MODELS)
 
-    # Charger les modes avec leur ordre personnalisé
+        # Charger les modes avec leur ordre personnalisé
     modes_config = load_modes()
     ordered_modes = {}
 
@@ -34,8 +34,8 @@ def index():
         elif mode_id in modes_config.get('custom', {}):
             ordered_modes[mode_id] = modes_config['custom'][mode_id]
     return render_template('index.html',
-                           modes=ordered_modes,  # Passer un dictionnaire
-                           models={k: v["name"] for k, v in AVAILABLE_MODELS.items()},
+                           modes=ordered_modes,
+                           models=AVAILABLE_MODELS,  # On passe l'objet complet
                            current_model=config.get('model'),
                            current_theme=config.get('theme', 'light'),
                            has_api_key=bool(config.get('api_key')))
@@ -99,8 +99,13 @@ def get_config():
         'api_key': config.get('api_key'),
         'model': config.get('model'),
         'theme': config.get('theme', 'light'),
-        'shortcut': config.get('shortcut', DEFAULT_SHORTCUT)
+        'shortcut': config.get('shortcut', DEFAULT_SHORTCUT),
+        'custom_endpoint': config.get('custom_endpoint', {
+            'url': '',
+            'model_name': ''
+        })
     })
+
 
 
 @bp.route('/api/config', methods=['POST'])
@@ -111,6 +116,12 @@ def set_config():
     model = data.get('model', 'gemini-1.5-flash')
     theme = data.get('theme', 'light')
     new_shortcut = data.get('shortcut', DEFAULT_SHORTCUT)
+
+    # Nouvelle configuration pour l'endpoint personnalisé
+    custom_endpoint = {
+        'url': data.get('custom_endpoint_url', '').strip(),
+        'model_name': data.get('custom_endpoint_model', '').strip()
+    }
 
     current_config = load_config()
     current_shortcut = current_config.get('shortcut', DEFAULT_SHORTCUT)
@@ -126,13 +137,14 @@ def set_config():
                 'error': f'Erreur lors de la suppression: {str(e)}'
             }), 500
 
-    if not model:
-        return jsonify({
-            'success': False,
-            'error': 'Configuration incomplète'
-        }), 400
-
-    if save_config(api_key, model, theme, CURRENT_VERSION, new_shortcut):
+    if save_config(
+            api_key=api_key,
+            model=model,
+            theme=theme,
+            last_version=CURRENT_VERSION,
+            shortcut=new_shortcut,
+            custom_endpoint=custom_endpoint
+    ):
         if new_shortcut != current_shortcut:
             restart_application()
         return jsonify({'success': True})

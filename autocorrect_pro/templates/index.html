@@ -44,20 +44,29 @@
                 </div>
             </div>
 
-            <!-- Section Modèle d'IA -->
             <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-2">
-                    <i class="fas fa-robot text-indigo-500 mr-2"></i>Modèle d'IA
-                </h3>
-                <select id="modelSelect"
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input">
-                    {% for model_id, model_name in models.items() %}
-                    <option value="{{ model_id }}" {% if model_id== current_model %}selected{% endif %}>
-                        {{ model_name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
+    <h3 class="text-sm font-medium text-gray-700 mb-2">
+        <i class="fas fa-robot text-indigo-500 mr-2"></i>Modèle d'IA
+    </h3>
+    <select id="modelSelect"
+            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input">
+        {% for model_id, model_info in models.items() %}
+        <option value="{{ model_id }}" {% if model_id == current_model %}selected{% endif %}>
+            {{ model_info.name }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <!-- Configuration endpoint personnalisé -->
+    <div id="customEndpointConfig" class="mt-4 hidden">
+        <input type="text" id="customEndpointUrl"
+               class="w-full px-4 py-2 mb-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+               placeholder="URL de l'endpoint (ex: http://127.0.0.1:9090/v1)">
+        <input type="text" id="customEndpointModel"
+               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+               placeholder="Nom du modèle">
+    </div>
+</div>
 
             <div>
                 <h3 class="text-sm font-medium text-gray-700 mb-2">
@@ -335,6 +344,15 @@
         // Initialisation
         updatePageVisibility();
     });
+    // Custom endpoint
+    document.getElementById('modelSelect').addEventListener('change', function() {
+    const customEndpointConfig = document.getElementById('customEndpointConfig');
+    if (this.value === 'custom') {
+        customEndpointConfig.classList.remove('hidden');
+    } else {
+        customEndpointConfig.classList.add('hidden');
+    }
+});
 
     // Gestion de la barre latérale
     const sidebar = document.getElementById('sidebar');
@@ -356,29 +374,43 @@
         setTheme(theme);
     });
 
-    openSidebarBtn.addEventListener('click', () => {
-        sidebar.classList.remove('translate-x-full');
-        sidebar.classList.add('translate-x-0');
+// Dans la partie où on charge la configuration existante
+openSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.remove('translate-x-full');
+    sidebar.classList.add('translate-x-0');
 
-        // Charger la configuration existante
-        fetch('/api/config')
-            .then(response => response.json())
-            .then(data => {
-                if (data.has_key) {
-                    apiKeyInput.value = data.api_key;
+    // Charger la configuration existante
+    fetch('/api/config')
+        .then(response => response.json())
+        .then(data => {
+            if (data.has_key) {
+                apiKeyInput.value = data.api_key;
+            }
+            if (data.model) {
+                document.getElementById('modelSelect').value = data.model;
+                // Afficher/masquer les champs d'endpoint personnalisé si nécessaire
+                const customEndpointConfig = document.getElementById('customEndpointConfig');
+                if (data.model === 'custom') {
+                    customEndpointConfig.classList.remove('hidden');
+                    // Remplir les champs avec les valeurs sauvegardées
+                    if (data.custom_endpoint) {
+                        document.getElementById('customEndpointUrl').value = data.custom_endpoint.url || '';
+                        document.getElementById('customEndpointModel').value = data.custom_endpoint.model_name || '';
+                    }
+                } else {
+                    customEndpointConfig.classList.add('hidden');
                 }
-                if (data.model) {
-                    document.getElementById('modelSelect').value = data.model;
-                }
-                if (data.theme) {
-                    document.getElementById('themeSelect').value = data.theme;
-                    setTheme(data.theme);
-                }
-                if (data.shortcut) {
-                    shortcutInput.value = data.shortcut;
-                }
-            });
-    });
+            }
+            if (data.theme) {
+                document.getElementById('themeSelect').value = data.theme;
+                setTheme(data.theme);
+            }
+            if (data.shortcut) {
+                shortcutInput.value = data.shortcut;
+            }
+        });
+});
+
 
     closeSidebarBtn.addEventListener('click', () => {
         sidebar.classList.remove('translate-x-0');
@@ -453,37 +485,40 @@
         }
     });
 
-    function saveConfig(apiKey, selectedModel, selectedTheme, newShortcut) {
-        fetch('/api/config', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                api_key: apiKey,
-                model: selectedModel,
-                theme: selectedTheme,
-                shortcut: newShortcut
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showSuccessAlert();
-                    sidebar.classList.add('translate-x-full');
+function saveConfig(apiKey, selectedModel, selectedTheme, newShortcut) {
+    const config = {
+        api_key: apiKey,
+        model: selectedModel,
+        theme: selectedTheme,
+        shortcut: newShortcut
+    };
 
-                    // Ajouter une animation de succès
-                    saveApiKeyBtn.classList.add('save-success');
-                    setTimeout(() => saveApiKeyBtn.classList.remove('save-success'), 2000);
-                } else {
-                    showErrorAlert();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Erreur lors de la sauvegarde de la configuration');
-            });
+    if (selectedModel === 'custom') {
+        config.custom_endpoint_url = document.getElementById('customEndpointUrl').value;
+        config.custom_endpoint_model = document.getElementById('customEndpointModel').value;
     }
+
+    fetch('/api/config', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(config)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccessAlert();
+            sidebar.classList.add('translate-x-full');
+        } else {
+            showErrorAlert();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showErrorAlert();
+    });
+}
 
     // Sélection du mode
     const modeButtons = document.querySelectorAll('.mode-button');

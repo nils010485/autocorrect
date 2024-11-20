@@ -27,7 +27,6 @@ def ensure_config_dir() -> None:
     """Assure que le répertoire de configuration existe."""
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
-
 def load_config() -> dict:
     """Charge la configuration depuis le fichier JSON."""
     try:
@@ -37,14 +36,17 @@ def load_config() -> dict:
                 # Assurez-vous que toutes les clés nécessaires sont présentes
                 for key, value in DEFAULT_CONFIG.items():
                     if key not in config:
-                        config[key] = value
+                        if key == 'custom_endpoint':
+                            config[key] = {'url': '', 'model_name': ''}
+                        else:
+                            config[key] = value
                 return config
     except Exception as e:
         print(f"Erreur lors de la lecture de la configuration: {e}")
     return DEFAULT_CONFIG.copy()
 
-
-def save_config(api_key=None, model=None, theme=None, last_version=None, shortcut=None, modes=None) -> bool:
+def save_config(api_key=None, model=None, theme=None, last_version=None,
+                shortcut=None, modes=None, custom_endpoint=None) -> bool:
     """Sauvegarde la configuration dans le fichier JSON."""
     try:
         config = load_config()
@@ -60,6 +62,12 @@ def save_config(api_key=None, model=None, theme=None, last_version=None, shortcu
             config['shortcut'] = shortcut
         if modes is not None:
             config['modes'] = modes
+        if custom_endpoint is not None:
+            config['custom_endpoint'] = custom_endpoint
+
+        # Assurer que custom_endpoint existe toujours
+        if 'custom_endpoint' not in config:
+            config['custom_endpoint'] = {'url': '', 'model_name': ''}
 
         with open(CONFIG_FILE, 'w') as f:
             json.dump(config, f, indent=2)
@@ -67,8 +75,6 @@ def save_config(api_key=None, model=None, theme=None, last_version=None, shortcu
     except Exception as e:
         print(f"Erreur lors de la sauvegarde de la configuration: {e}")
         return False
-
-
 
 def load_api_key() -> Optional[str]:
     """Charge la clé API depuis le fichier de configuration."""
@@ -85,15 +91,14 @@ def save_api_key(api_key: str) -> bool:
     """Sauvegarde la clé API dans le fichier de configuration."""
     try:
         ensure_config_dir()
-        config = {'api_key': api_key}
+        config = load_config()  # Charger la configuration existante
+        config['api_key'] = api_key
         with open(CONFIG_FILE, 'w') as f:
             json.dump(config, f, indent=2)
         return True
     except Exception as e:
         console.print(f"[bold red]Erreur lors de la sauvegarde de la clé API: {e}[/bold red]")
         return False
-
-
 
 def load_modes() -> dict:
     """Charge les modes depuis la configuration."""
@@ -127,7 +132,6 @@ def load_modes() -> dict:
 
     return config['modes']
 
-
 def save_custom_mode(mode_data):
     """Sauvegarde un nouveau mode personnalisé."""
     config = load_config()
@@ -145,5 +149,22 @@ def save_custom_mode(mode_data):
     }
 
     config['modes']['order'].append(mode_id)
-    return save_config(config)
+    return save_config(modes=config['modes'])
 
+def get_custom_endpoint() -> Dict[str, str]:
+    """Récupère la configuration de l'endpoint personnalisé."""
+    config = load_config()
+    return config.get('custom_endpoint', {'url': '', 'model_name': ''})
+
+def save_custom_endpoint(url: str, model_name: str) -> bool:
+    """Sauvegarde la configuration de l'endpoint personnalisé."""
+    try:
+        config = load_config()
+        config['custom_endpoint'] = {
+            'url': url.strip(),
+            'model_name': model_name.strip()
+        }
+        return save_config(custom_endpoint=config['custom_endpoint'])
+    except Exception as e:
+        console.print(f"[bold red]Erreur lors de la sauvegarde de l'endpoint personnalisé: {e}[/bold red]")
+        return False
