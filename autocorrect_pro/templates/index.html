@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+
 
 </head>
 <body class="bg-slate-50">
@@ -25,7 +27,6 @@
         </div>
 
         <div class="space-y-6">
-            <!-- Section Clé API -->
             <!-- Section Clé API -->
             <div>
                 <h3 class="text-sm font-medium text-gray-700 mb-2">
@@ -271,14 +272,26 @@
         </div>
 
         <!-- Indicateur de chargement -->
-        <div id="loading" class="hidden">
-            <div class="flex items-center justify-center space-x-4 bg-white rounded-xl p-6 shadow-sm">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
-                <span class="text-gray-600">Traitement en cours...</span>
+<!-- Remplacer le div loading actuel par : -->
+<div id="loading" class="hidden">
+    <div class="flex items-center justify-center space-x-6 bg-white rounded-xl p-6 shadow-sm">
+        <div class="network-loader">
+            <div class="particles">
+                <div class="particle p1"></div>
+                <div class="particle p2"></div>
+                <div class="particle p3"></div>
+                <div class="particle p4"></div>
+                <div class="particle p5"></div>
+                <div class="particle p6"></div>
+                <div class="rotator">
+                    <div class="circle"></div>
+                </div>
             </div>
         </div>
+        <span class="text-gray-600">Traitement en cours...</span>
+    </div>
+</div>
 
-        <!-- Résultat -->
         <!-- Résultat -->
         <div id="result" class="hidden bg-white rounded-xl p-6 shadow-sm" data-aos="fade-up" data-aos-delay="200">
             <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -566,7 +579,7 @@
         submitBtn.disabled = true;
         loading.classList.remove('hidden');
         result.classList.add('hidden');
-        resultText.textContent = '';
+        resultText.innerHTML = '';
 
         const formData = new FormData();
         formData.append('mode', selectedModeInput.value);
@@ -588,7 +601,6 @@
 
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
-            let fullText = '';
 
             while (true) {
                 const {value, done} = await reader.read();
@@ -599,16 +611,17 @@
 
                 for (const line of lines) {
                     if (line.startsWith('data: ')) {
-                        const data = line.slice(6);
-                        if (data === '[END]') {
-                            submitBtn.disabled = false;
-                            AOS.refresh();
-                            document.getElementById('result-buttons').classList.remove('hidden');
-                            return;
-                        }
-                        console.log("Received chunk:", data); // Debug
-                        resultText.textContent = data;
+                    const data = line.slice(6);
+                    if (data === '[END]') {
+                        submitBtn.disabled = false;
+                        AOS.refresh();
+                        document.getElementById('result-buttons').classList.remove('hidden');
+                        return;
                     }
+                    console.log("Received chunk:", data);
+                    // Remplacer les retours à la ligne par des <br> et utiliser innerHTML
+                    resultText.innerHTML = data.replace(/\n/g, '<br>');
+                }
                 }
             }
         } catch (error) {
