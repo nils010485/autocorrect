@@ -12,10 +12,10 @@ else:
 
 CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = CONFIG_DIR / "gemini.json"
-ICON_PATH = Path(__file__).resolve().parent / 'templates' / 'faveicon.ico'
+ICON_PATH = Path(__file__).resolve().parent / 'static' / 'favicon.ico'
 
 # Configuration générale
-CURRENT_VERSION = 8
+CURRENT_VERSION = 9
 DEFAULT_SHORTCUT = "Ctrl+Space"
 
 # Configuration des modèles AI

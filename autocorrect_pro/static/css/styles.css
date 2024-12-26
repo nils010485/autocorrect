@@ -251,3 +251,85 @@ body {
 .microphone-btn:active {
     transform: scale(0.95);
 }
+
+/* Nouvelles animations.. */
+
+/* Animation pour les boutons */
+.mode-button {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mode-button:hover {
+    transform: translateY(-2px);
+}
+
+.mode-button:active {
+    transform: translateY(1px);
+}
+
+/* Animation pour les boutons d'action */
+button {
+    transition: all 0.2s ease-in-out;
+}
+
+button:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+/* Animation pour les inputs */
+input, textarea, select {
+    transition: all 0.3s ease;
+}
+
+/* Animation pour le résultat */
+#result {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Animation pour le loading */
+.animate-spin {
+    transition: all 0.3s ease;
+}
+
+/* Animation pour les icônes */
+.fas {
+    transition: all 0.2s ease;
+}
+
+/* Animation pour les hover states */
+.hover\:bg-gray-100,
+.hover\:bg-indigo-600,
+.hover\:bg-indigo-700,
+.hover\:text-indigo-600 {
+    transition: all 0.2s ease;
+}
+
+/* Animation pour le focus des inputs */
+.focus\:ring-2:focus {
+    transition: all 0.2s ease;
+}
+
+/* Animation pour les cartes */
+.shadow-sm {
+    transition: all 0.3s ease;
+}
+
+.shadow-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Animation pour les boutons de pagination */
+#prevPage, #nextPage {
+    transition: transform 0.2s ease;
+}
+
+#prevPage:hover, #nextPage:hover {
+    transform: scale(1.1);
+}
+
+/* Animation pour le sidebar */
+.sidebar-transition {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

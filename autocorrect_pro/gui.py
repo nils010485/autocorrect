@@ -17,11 +17,12 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowIcon(QIcon(str(ICON_PATH)))
         self.setWindowTitle("AI-AutoCorrect")
-        self.setWindowFlags(Qt.WindowType.Window)  # Ajouter cette ligne
+        self.setWindowFlags(Qt.WindowType.Window)
         self._setup_window_geometry()
         self._setup_web_view(port)
         self.create_tray_icon()
         self.toggle_signal.connect(self._toggle_visibility)
+
 
         try:
             self.setup_keyboard_listener()
