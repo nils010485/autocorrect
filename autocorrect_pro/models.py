@@ -86,6 +86,7 @@ def _stream_openai(prompt: str, api_key: str, model_name: str) -> Generator[str,
     client = OpenAI(api_key=api_key)
     response = client.chat.completions.create(
         model=model_name,
+        temperature=0,
         messages=[{"role": "user", "content": prompt}],
         stream=True
     )
@@ -98,6 +99,7 @@ def _stream_custom_openai(prompt: str, api_key: str, model_name: str, base_url: 
     client = OpenAI(api_key=api_key, base_url=base_url)
     response = client.chat.completions.create(
         model=model_name,
+        temperature=0,
         messages=[{"role": "user", "content": prompt}],
         stream=True
     )
@@ -110,6 +112,7 @@ def _stream_anthropic(prompt: str, api_key: str, model_name: str) -> Generator[s
     client = anthropic.Anthropic(api_key=api_key)
     with client.messages.stream(
             max_tokens=4096,
+            temperature=0,
             messages=[{"role": "user", "content": prompt}],
             model=model_name,
     ) as stream:
