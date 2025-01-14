@@ -45,7 +45,7 @@ class MainWindow(QMainWindow):
         scale_factor = dpi / 96.0
 
         width = int(1000 * scale_factor)
-        height = int(900 * scale_factor)
+        height = int(950 * scale_factor)
         min_width = int(800 * scale_factor)
         min_height = int(600 * scale_factor)
 

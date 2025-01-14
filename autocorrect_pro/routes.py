@@ -9,6 +9,7 @@ from .config import MODES, AVAILABLE_MODELS, CURRENT_VERSION, DEFAULT_SHORTCUT, 
 from .utils import load_config, save_config, restart_application, load_modes
 from .models import stream_response
 from .utils import validate_audio_file
+
 bp = Blueprint('main', __name__)
 
 
@@ -186,7 +187,6 @@ def get_config():
     })
 
 
-
 @bp.route('/api/config', methods=['POST'])
 def set_config():
     """Configure l'API key, le modèle, le thème et le raccourci."""
@@ -201,8 +201,6 @@ def set_config():
         'url': data.get('custom_endpoint_url', '').strip(),
         'model_name': data.get('custom_endpoint_model', '').strip()
     }
-
-
 
     current_config = load_config()
     current_shortcut = current_config.get('shortcut', DEFAULT_SHORTCUT)
@@ -238,20 +236,12 @@ def set_config():
     }), 500
 
 
-@bp.route('/custom-mode', methods=['GET'])
-def custom_mode_page():
-    """Page de création de mode personnalisé."""
-    config = load_config()
-    return render_template('custom_mode.html',
-                         current_theme=config.get('theme', 'light'))
-
-
 @bp.route('/edit-order', methods=['GET'])
 def edit_order_page():
     """Page d'édition de l'ordre des modes."""
     config = load_config()
     return render_template('edit_order.html',
-                         current_theme=config.get('theme', 'light'))
+                           current_theme=config.get('theme', 'light'))
 
 
 @bp.route('/api/modes', methods=['GET', 'POST', 'PUT'])

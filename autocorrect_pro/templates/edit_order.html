@@ -3,146 +3,494 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Réorganiser les Modes - AI-AutoCorrect</title>
+    <title>Gestion des Modes - AI-AutoCorrect</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-
 </head>
 <body class="bg-slate-50 min-h-screen" data-theme="{{ current_theme }}">
-
-<header class="fixed top-0 left-0 right-0 bg-white shadow-md z-40" style="background-color: var(--bg-secondary)">
-    <div class="container mx-auto px-4 py-4">
-        <div class="flex justify-between items-center">
-            <a href="/" class="text-2xl font-bold flex items-center" style="color: var(--indigo-primary)">
-                <i class="fas fa-chevron-left mr-4 text-xl"></i>
-                <i class="fas fa-sort mr-2"></i>Réorganiser les Modes
-            </a>
-            <button id="saveOrder"
-                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
-                <i class="fas fa-save mr-2"></i>Sauvegarder
-            </button>
+    <!-- En-tête -->
+    <header class="fixed top-0 left-0 right-0 bg-white shadow-md z-40">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="/" class="text-2xl font-bold text-indigo-700 flex items-center">
+                    <i class="fas fa-chevron-left mr-4 text-xl"></i>
+                    <i class="fas fa-wand-magic-sparkles mr-2"></i>Gestion des Modes
+                </a>
+                <button id="saveOrder" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors hidden">
+                    <i class="fas fa-save mr-2"></i>Sauvegarder l'ordre
+                </button>
+            </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<!-- Contenu principal -->
-<main class="container mx-auto px-4 pt-24 pb-12">
-    <div class="max-w-2xl mx-auto">
-        <!-- Instructions -->
-        <div class="p-4 mb-6 rounded-lg border-l-4"
-             style="background-color: var(--bg-secondary); border-color: var(--indigo-primary)">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-info-circle" style="color: var(--indigo-primary)"></i>
+    <!-- Contenu principal -->
+    <main class="container mx-auto px-4 pt-24 pb-12">
+        <div class="max-w-4xl mx-auto">
+            <!-- Onglets -->
+            <div class="flex space-x-4 mb-6">
+                <button id="tabCustom" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                    <i class="fas fa-list-ul mr-2"></i>Modes personnalisés
+                </button>
+                <button id="tabOrder" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                    <i class="fas fa-sort mr-2"></i>Réorganiser les modes
+                </button>
+            </div>
+
+            <!-- Section des modes personnalisés -->
+            <div id="customModeSection">
+                <!-- Liste des modes existants -->
+                <div class="mb-8 bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center text-gray-800">
+                        <i class="fas fa-list-ul text-indigo-500 mr-2"></i>
+                        Modes personnalisés
+                    </h2>
+                    <div id="modesList" class="space-y-4">
+                        <!-- Les modes seront injectés ici via JavaScript -->
+                    </div>
                 </div>
-                <div class="ml-3">
-                    <p class="text-sm" style="color: var(--text-primary)">
-                        Faites glisser les modes pour modifier leur ordre d'apparition.
-                        Les changements seront appliqués après la sauvegarde.
-                    </p>
+
+                <!-- Formulaire de création -->
+                <form id="customModeForm" class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-xl font-semibold mb-6 flex items-center text-gray-800">
+                        <i class="fas fa-plus-circle text-indigo-500 mr-2"></i>
+                        Créer un nouveau mode
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Titre -->
+                        <div>
+                            <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+                                Titre du mode
+                            </label>
+                            <input type="text" id="title" name="title" required
+                                   class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                                   placeholder="Ex: Simplifier">
+                        </div>
+
+                        <!-- Icône -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                Icône
+                            </label>
+                            <div class="grid grid-cols-5 gap-2 p-4 border rounded-lg bg-gray-50 dark:bg-gray-800">
+                                <div id="iconGrid" class="contents">
+                                    <!-- Les icônes seront injectées ici -->
+                                </div>
+                            </div>
+                            <input type="hidden" id="selectedIconInput" name="icon" required>
+                        </div>
+                    </div>
+
+                    <!-- Prompt -->
+                    <div class="mt-6">
+                        <label for="prompt" class="block text-sm font-medium text-gray-700 mb-2">
+                            Instructions pour l'IA
+                        </label>
+                        <textarea id="prompt" name="prompt" required rows="6"
+                                  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 resize-none"
+                                  placeholder="Rôle : [Définissez le rôle]&#10;Tâche : [Décrivez la tâche]&#10;Instructions :&#10;- [Instruction 1]&#10;- [Instruction 2]&#10;Format de sortie : [Précisez le format]"></textarea>
+                    </div>
+
+                    <!-- Boutons -->
+                    <div class="flex space-x-4 mt-6">
+                        <button type="submit"
+                                class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 transition-colors flex items-center justify-center">
+                            <i class="fas fa-save mr-2"></i>Créer le mode
+                        </button>
+                        <button type="button" onclick="window.location.href='/'"
+                                class="flex-1 bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700 transition-colors flex items-center justify-center">
+                            <i class="fas fa-times mr-2"></i>Annuler
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Section de réorganisation des modes -->
+            <div id="orderModeSection" class="hidden">
+                <!-- Instructions -->
+                <div class="p-4 mb-6 rounded-lg border-l-4"
+                     style="background-color: var(--bg-secondary); border-color: var(--indigo-primary)">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle" style="color: var(--indigo-primary)"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm" style="color: var(--text-primary)">
+                                Faites glisser les modes pour modifier leur ordre d'apparition.
+                                Les changements seront appliqués après la sauvegarde.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Liste des modes -->
+                <div id="orderModesList" class="space-y-2">
+                    <!-- Les modes seront injectés ici via JavaScript -->
                 </div>
             </div>
         </div>
+    </main>
 
+    <script>
+        // Liste des icônes
+        const icons = [
+            'fa-language', 'fa-spell-check', 'fa-star', 'fa-magic', 'fa-pen',
+            'fa-book', 'fa-comment', 'fa-lightbulb', 'fa-check', 'fa-edit',
+            'fa-compress-alt', 'fa-expand-alt', 'fa-robot', 'fa-brain', 'fa-cog'
+        ];
 
-        <!-- Liste des modes -->
-        <div id="modesList" class="space-y-2">
-            <!-- Les modes seront injectés ici via JavaScript -->
-        </div>
-    </div>
-</main>
+        // Création de la grille d'icônes
+        const iconGrid = document.getElementById('iconGrid');
+        icons.forEach(icon => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'icon-button p-3 rounded-lg hover:bg-indigo-100 dark:hover:bg-gray-700 dark:text-gray-200 transition-colors';
+            button.innerHTML = `<i class="fas ${icon} text-xl"></i>`;
+            button.dataset.icon = icon;
+            button.onclick = (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.icon-button').forEach(btn =>
+                    btn.classList.remove('bg-indigo-100', 'dark:bg-gray-700'));
+                button.classList.add('bg-indigo-100', 'dark:bg-gray-700');
+                document.getElementById('selectedIconInput').value = icon;
+            };
+            iconGrid.appendChild(button);
+        });
 
-<script>
-    document.addEventListener('DOMContentLoaded', async function () {
+        // Gestion du thème
+        document.addEventListener('DOMContentLoaded', function () {
+            // Récupérer le thème sauvegardé
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
 
-        // Récupérer le thème sauvegardé
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        document.documentElement.setAttribute('data-theme', savedTheme);
-
-        // Observer les changements de thème
-        const observer = new MutationObserver(function (mutations) {
-            mutations.forEach(function (mutation) {
-                if (mutation.attributeName === 'data-theme') {
-                    const theme = document.documentElement.getAttribute('data-theme');
-                    if (theme === 'dark') {
-                        document.body.classList.remove('bg-slate-50');
-                        document.body.classList.add('bg-gray-900');
-                    } else {
-                        document.body.classList.remove('bg-gray-900');
-                        document.body.classList.add('bg-slate-50');
-                    }
+            function updateTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    document.body.classList.remove('bg-slate-50');
+                    document.body.classList.add('bg-gray-900');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    document.body.classList.remove('bg-gray-900');
+                    document.body.classList.add('bg-slate-50');
                 }
-            });
-        });
+            }
 
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['data-theme']
-        });
-
-        // Appliquer le thème initial
-        if (savedTheme === 'dark') {
-            document.body.classList.remove('bg-slate-50');
-            document.body.classList.add('bg-gray-900');
-        }
-        const modesList = document.getElementById('modesList');
-
-// Charger les modes
-try {
-    const response = await fetch('/api/modes');
-    const data = await response.json();
-
-    data.order.forEach((modeId) => {
-        const mode = data.custom[modeId] || data.system[modeId];
-
-
-        const isCustomMode = data.custom && data.custom[modeId];
-
-        const div = document.createElement('div');
-        div.className = 'p-4 rounded-lg flex items-center justify-between';
-        div.style.backgroundColor = 'var(--bg-secondary)';
-        div.style.boxShadow = '0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color)';
-        div.dataset.id = modeId;
-        div.innerHTML = `
-            <div class="flex items-center">
-                <i class="fas ${mode.icon} text-xl mr-3" style="color: var(--indigo-primary)"></i>
-                <span class="font-medium" style="color: var(--text-primary)">${mode.title}</span>
-            </div>
-            <div class="flex items-center space-x-3">
-                ${isCustomMode ? `
-                    <button onclick="deleteMode('${modeId}', event)"
-                            class="text-red-500 hover:text-red-700 transition-colors">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                ` : ''}
-                <i class="fas fa-grip-vertical text-gray-400 cursor-move"></i>
-            </div>
-        `;
-        modesList.appendChild(div);
-    });
-
-
-            // Initialiser Sortable
-            new Sortable(modesList, {
-                animation: 150,
-                ghostClass: 'bg-indigo-50'
+            // Observer les changements de thème
+            const observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    if (mutation.attributeName === 'data-theme') {
+                        const theme = document.documentElement.getAttribute('data-theme');
+                        updateTheme(theme);
+                    }
+                });
             });
 
-        } catch (error) {
-            console.error('Erreur lors du chargement des modes:', error);
-            showSweetAlert({
-                icon: 'error',
-                title: 'Erreur',
-                text: 'Impossible de charger les modes'
+            observer.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['data-theme']
+            });
+
+            // Appliquer le thème initial
+            if (savedTheme === 'dark') {
+                document.body.classList.remove('bg-slate-50');
+                document.body.classList.add('bg-gray-900');
+            }
+            updateTheme(savedTheme);
+        });
+
+        // Fonction pour les alertes avec thème
+        function showAlert(title, text, icon, showCancelButton = false) {
+            const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+
+            return Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+                showCancelButton: showCancelButton,
+                confirmButtonColor: '#6366f1',
+                cancelButtonColor: '#f87171',
+                confirmButtonText: 'OK',
+                cancelButtonText: 'Annuler',
+                customClass: isDarkTheme ? {
+                    popup: 'swal2-dark',
+                    title: 'swal2-title-dark',
+                    content: 'swal2-content-dark',
+                    confirmButton: 'swal2-confirm-dark',
+                    cancelButton: 'swal2-cancel-dark'
+                } : {}
             });
         }
 
-        // Gestion de la sauvegarde
+        // Chargement et affichage des modes existants
+        async function loadModes() {
+            try {
+                const response = await fetch('/api/modes');
+                const data = await response.json();
+                const modesList = document.getElementById('modesList');
+                const orderModesList = document.getElementById('orderModesList');
+                modesList.innerHTML = '';
+                orderModesList.innerHTML = '';
+
+                // Afficher les modes personnalisés
+                if (data.custom) {
+                    Object.entries(data.custom).forEach(([id, mode]) => {
+                        const modeElement = document.createElement('div');
+                        modeElement.className = 'border rounded-lg overflow-hidden mb-4';
+                        modeElement.innerHTML = `
+                            <div class="flex items-center justify-between p-4 cursor-pointer mode-header"
+                                 onclick="toggleModeDetails('${id}')">
+                                <div class="flex items-center">
+                                    <i class="fas ${mode.icon} text-xl text-indigo-500 mr-3"></i>
+                                    <span class="font-medium text-gray-700">${mode.title}</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <button onclick="editMode('${id}', event)"
+                                            class="text-indigo-500  p-2">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="deleteMode('${id}', event)"
+                                            class="text-red-500 hover:text-red-700 p-2">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                    <i class="fas fa-chevron-down text-gray-400 transition-transform duration-300"></i>
+                                </div>
+                            </div>
+                            <div id="mode-details-${id}" class="hidden">
+                                <div class="p-4 border-t bg-white" data-theme="light">
+                                    <div class="mb-2">
+                                        <label class="block text-sm font-medium text-gray-800 mb-2">
+                                            Instructions pour l'IA
+                                        </label>
+                                        <div class="relative">
+                                            <textarea id="prompt-${id}"
+                                                      class="w-full px-4 py-2 border rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 resize-none"
+                                                      rows="6"
+                                                      readonly
+                                            >${mode.prompt}</textarea>
+                                            <button onclick="toggleEdit('${id}')"
+                                                    class="absolute top-2 right-2 text-indigo-500 hover:text-indigo-700 bg-white rounded-full p-2 shadow-sm"
+                                                    style="background-color: var(--bg-secondary)">
+                                                <i id="edit-icon-${id}" class="fas fa-lock"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-end space-x-2 mt-4">
+                                        <button onclick="cancelEdit('${id}')"
+                                                id="cancel-${id}"
+                                                class="hidden px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 dark:bg-gray-600 dark:hover:bg-gray-700">
+                                            Annuler
+                                        </button>
+                                        <button onclick="savePrompt('${id}')"
+                                                id="save-${id}"
+                                                class="hidden px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 dark:bg-indigo-700 dark:hover:bg-indigo-800">
+                                            Sauvegarder
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        modesList.appendChild(modeElement);
+
+                        // Ajouter les modes personnalisés à la liste de réorganisation
+                        const orderModeElement = document.createElement('div');
+                        orderModeElement.className = 'p-4 rounded-lg flex items-center justify-between';
+                        orderModeElement.style.backgroundColor = 'var(--bg-secondary)';
+                        orderModeElement.style.boxShadow = '0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color)';
+                        orderModeElement.dataset.id = id;
+                        orderModeElement.innerHTML = `
+                            <div class="flex items-center">
+                                <i class="fas ${mode.icon} text-xl mr-3" style="color: var(--indigo-primary)"></i>
+                                <span class="font-medium" style="color: var(--text-primary)">${mode.title}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="deleteMode('${id}', event)"
+                                        class="text-red-500 hover:text-red-700 transition-colors">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                                <i class="fas fa-grip-vertical text-gray-400 cursor-move"></i>
+                            </div>
+                        `;
+                        orderModesList.appendChild(orderModeElement);
+                    });
+                }
+
+                // Ajouter les modes système à la liste de réorganisation
+                if (data.system) {
+                    Object.entries(data.system).forEach(([id, mode]) => {
+                        const orderModeElement = document.createElement('div');
+                        orderModeElement.className = 'p-4 rounded-lg flex items-center justify-between';
+                        orderModeElement.style.backgroundColor = 'var(--bg-secondary)';
+                        orderModeElement.style.boxShadow = '0 4px 6px -1px var(--shadow-color), 0 2px 4px -1px var(--shadow-color)';
+                        orderModeElement.dataset.id = id;
+                        orderModeElement.innerHTML = `
+                            <div class="flex items-center">
+                                <i class="fas ${mode.icon} text-xl mr-3" style="color: var(--indigo-primary)"></i>
+                                <span class="font-medium" style="color: var(--text-primary)">${mode.title}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-grip-vertical text-gray-400 cursor-move"></i>
+                            </div>
+                        `;
+                        orderModesList.appendChild(orderModeElement);
+                    });
+                }
+
+                // Initialiser Sortable
+                new Sortable(orderModesList, {
+                    animation: 150,
+                    ghostClass: 'bg-indigo-50'
+                });
+
+            } catch (error) {
+                console.error('Erreur lors du chargement des modes:', error);
+                showAlert('Erreur', 'Erreur lors du chargement des modes', 'error');
+            }
+        }
+
+        function toggleModeDetails(modeId) {
+            const details = document.getElementById(`mode-details-${modeId}`);
+            const chevron = details.previousElementSibling.querySelector('.fa-chevron-down');
+
+            if (details.classList.contains('hidden')) {
+                details.classList.remove('hidden');
+                chevron.style.transform = 'rotate(180deg)';
+            } else {
+                details.classList.add('hidden');
+                chevron.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function toggleEdit(modeId) {
+            const textarea = document.getElementById(`prompt-${modeId}`);
+            const editIcon = document.getElementById(`edit-icon-${modeId}`);
+            const saveBtn = document.getElementById(`save-${modeId}`);
+            const cancelBtn = document.getElementById(`cancel-${modeId}`);
+
+            if (textarea.readOnly) {
+                textarea.readOnly = false;
+                textarea.classList.add('border-indigo-500');
+                editIcon.classList.remove('fa-lock');
+                editIcon.classList.add('fa-lock-open');
+                saveBtn.classList.remove('hidden');
+                cancelBtn.classList.remove('hidden');
+                textarea.dataset.original = textarea.value;
+            } else {
+                textarea.readOnly = true;
+                textarea.classList.remove('border-indigo-500');
+                editIcon.classList.remove('fa-lock-open');
+                editIcon.classList.add('fa-lock');
+                saveBtn.classList.add('hidden');
+                cancelBtn.classList.add('hidden');
+            }
+        }
+
+        function cancelEdit(modeId) {
+            const textarea = document.getElementById(`prompt-${modeId}`);
+            textarea.value = textarea.dataset.original;
+            toggleEdit(modeId);
+        }
+
+        async function savePrompt(modeId) {
+            const textarea = document.getElementById(`prompt-${modeId}`);
+            const newPrompt = textarea.value;
+
+            try {
+                const response = await fetch(`/api/modes/${modeId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        prompt: newPrompt
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Succès', 'Modifications enregistrées', 'success');
+                    toggleEdit(modeId);
+                } else {
+                    throw new Error(data.error || 'Erreur lors de la sauvegarde');
+                }
+            } catch (error) {
+                showAlert('Erreur', error.message, 'error');
+            }
+        }
+
+        async function deleteMode(modeId, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+
+            const result = await showAlert(
+                'Êtes-vous sûr ?',
+                "Cette action est irréversible !",
+                'warning',
+                true
+            );
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch(`/api/modes/${modeId}`, {
+                        method: 'DELETE'
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        await loadModes();
+                        showAlert('Supprimé !', 'Le mode a été supprimé.', 'success');
+                    } else {
+                        throw new Error(data.error);
+                    }
+                } catch (error) {
+                    showAlert('Erreur', error.message, 'error');
+                }
+            }
+        }
+
+        // Gestion du formulaire
+        document.getElementById('customModeForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = {
+                title: document.getElementById('title').value,
+                icon: document.getElementById('selectedIconInput').value,
+                prompt: document.getElementById('prompt').value
+            };
+
+            try {
+                const response = await fetch('/api/modes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    await loadModes();
+                    this.reset();
+                    document.querySelectorAll('.icon-button').forEach(btn =>
+                        btn.classList.remove('bg-indigo-100'));
+
+                    showAlert('Succès', 'Mode créé avec succès !', 'success');
+                } else {
+                    throw new Error(data.error || 'Erreur lors de la création du mode');
+                }
+            } catch (error) {
+                showAlert('Erreur', error.message, 'error');
+            }
+        });
+
+        // Gestion de la sauvegarde de l'ordre
         document.getElementById('saveOrder').addEventListener('click', async function () {
-            const newOrder = Array.from(modesList.children).map(el => el.dataset.id);
+            const newOrder = Array.from(document.getElementById('orderModesList').children).map(el => el.dataset.id);
 
             try {
                 const response = await fetch('/api/modes', {
@@ -156,90 +504,30 @@ try {
                 const data = await response.json();
 
                 if (data.success) {
-                    showSweetAlert({
-                        icon: 'success',
-                        title: 'Ordre sauvegardé !',
-                        text: 'Les changements ont été appliqués avec succès.',
-                        showConfirmButton: false,
-                        timer: 2000
-                    }).then(() => {
-                        window.location.href = '/';
-                    });
+                    showAlert('Succès', 'Ordre sauvegardé !', 'success');
                 } else {
                     throw new Error(data.error || 'Erreur lors de la sauvegarde');
                 }
             } catch (error) {
-                showSweetAlert({
-                    icon: 'error',
-                    title: 'Erreur',
-                    text: error.message
-                });
+                showAlert('Erreur', error.message, 'error');
             }
         });
-    });
 
-
-    async function deleteMode(modeId, event) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const result = await showSweetAlert({
-            title: 'Êtes-vous sûr ?',
-            text: "Cette action est irréversible !",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Oui, supprimer',
-            cancelButtonText: 'Annuler'
+        // Gestion des onglets
+        document.getElementById('tabCustom').addEventListener('click', function () {
+            document.getElementById('customModeSection').classList.remove('hidden');
+            document.getElementById('orderModeSection').classList.add('hidden');
+            document.getElementById('saveOrder').classList.add('hidden');
         });
 
-        if (result.isConfirmed) {
-            try {
-                const response = await fetch(`/api/modes/${modeId}`, {
-                    method: 'DELETE'
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    // Supprimer l'élément de la liste
-                    const element = document.querySelector(`[data-id="${modeId}"]`);
-                    element.remove();
-
-                    showSweetAlert({
-                        icon: 'success',
-                        title: 'Supprimé !',
-                        text: 'Le mode a été supprimé.',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                } else {
-                    throw new Error(data.error || 'Erreur lors de la suppression');
-                }
-            } catch (error) {
-                showSweetAlert({
-                    icon: 'error',
-                    title: 'Erreur',
-                    text: error.message
-                });
-            }
-        }
-    }
-
-    function showSweetAlert(options) {
-        const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
-        return Swal.fire({
-            ...options,
-            customClass: isDarkTheme ? {
-                popup: 'swal2-dark',
-                title: 'swal2-title-dark',
-                content: 'swal2-content-dark',
-                confirmButton: 'swal2-confirm-dark',
-                cancelButton: 'swal2-cancel-dark'
-            } : {}
+        document.getElementById('tabOrder').addEventListener('click', function () {
+            document.getElementById('customModeSection').classList.add('hidden');
+            document.getElementById('orderModeSection').classList.remove('hidden');
+            document.getElementById('saveOrder').classList.remove('hidden');
         });
-    }
 
-</script>
+        // Charger les modes au chargement de la page
+        loadModes();
+    </script>
 </body>
 </html>
