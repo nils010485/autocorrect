@@ -148,6 +148,6 @@ Pour voir le texte complet de la licence : [CC BY-NC 4.0](https://creativecommon
 
 <p align="center">
   Made with ❤️ by Nils<br>
-  © 2022-2024 AI AUTOCORRECT
+  © 2022-2025 AI AUTOCORRECT
 </p>
 
