@@ -15,7 +15,7 @@ CONFIG_FILE = CONFIG_DIR / "gemini.json"
 ICON_PATH = Path(__file__).resolve().parent / 'static' / 'favicon.ico'
 
 # Configuration générale
-CURRENT_VERSION = 10
+CURRENT_VERSION = 13
 DEFAULT_SHORTCUT = "Ctrl+Space"
 
 # Configuration des modèles AI
@@ -23,7 +23,7 @@ AVAILABLE_MODELS = {
     "gemini-1.5-flash": {
         "name": "Gemini Flash",
         "provider": "google",
-        "model_name": "gemini-1.5-flash"
+        "model_name": "gemini-2.0-flash"
     },
     "gpt-4o-mini": {
         "name": "OpenAI GPT-4o Mini",
@@ -164,7 +164,7 @@ Entrées :
 Message reçu : {original_message}
 Éléments de réponse : {user_response}
 Format de sortie : 
-Réponse au message originel formatée et avec une bonen syntaxe uniquement, sans métadonnées ni explications""",
+Réponse au message originel formatée et avec une bonne syntaxe uniquement, sans métadonnées ni explications""",
         "order": 7,
         "page": 3,
         "system": True

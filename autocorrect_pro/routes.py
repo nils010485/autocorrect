@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 
@@ -16,20 +17,26 @@ bp = Blueprint('main', __name__)
 @bp.route('/')
 def index():
     """Page principale de l'application."""
+
+    # Récupérer le paramètre 'text' de l'URL
+    text_from_url = request.args.get('text', '')
+    if text_from_url and text_from_url.startswith("b'") and text_from_url.endswith("'"):
+        text_from_url = text_from_url[2:-1].strip()
+
     config = load_config()
 
     # Vérifier si une mise à jour de la version est nécessaire
     if config.get('last_version', 1) < CURRENT_VERSION:
         save_config(api_key=config.get('api_key'), model=config.get('model'),
                     theme=config.get('theme'), last_version=CURRENT_VERSION)
-        return render_template('whatsnew.html', current_version=CURRENT_VERSION)
+        return render_template('whatsnew.html', current_version=CURRENT_VERSION, current_theme=config.get('theme', 'light'))
 
     # Vérifier si la clé API est présente
     if not config.get('api_key'):
         return render_template('wizzard.html',
                                models=AVAILABLE_MODELS)
 
-        # Charger les modes avec leur ordre personnalisé
+    # Charger les modes avec leur ordre personnalisé
     modes_config = load_modes()
     ordered_modes = {}
 
@@ -39,46 +46,60 @@ def index():
             ordered_modes[mode_id] = modes_config['system'][mode_id]
         elif mode_id in modes_config.get('custom', {}):
             ordered_modes[mode_id] = modes_config['custom'][mode_id]
+
     return render_template('index.html',
                            modes=ordered_modes,
                            models=AVAILABLE_MODELS,  # On passe l'objet complet
                            current_model=config.get('model'),
                            current_theme=config.get('theme', 'light'),
-                           has_api_key=bool(config.get('api_key')))
+                           has_api_key=bool(config.get('api_key')),
+                           text_from_url=text_from_url)  # Passer le texte à la vue
 
+@bp.route('/restart', methods=['GET'])
+def restart_endpoint():
+    restart_application()
 
 @bp.route('/process', methods=['POST'])
 def process():
     """Traite les requêtes de génération de texte."""
     mode = request.form.get('mode')
     input_text = request.form.get('input_text')
+    # Keep original newlines from the input textarea for the AI model if needed
+    # input_text = input_text.replace('\n', '<br>') # --> Remove this if you want the AI to see actual newlines
+
     user_response = request.form.get('user_response') if mode == 'repondre' else None
     config = load_config()
 
-    # Charger tous les modes (système et personnalisés)
     modes_config = load_modes()
     all_modes = {**modes_config['system'], **modes_config.get('custom', {})}
 
-    # Vérifier si le mode est reconnu
     if mode not in all_modes:
         return jsonify({'error': f"Mode '{mode}' non reconnu."}), 400
 
     def generate():
+        buffer = ""
         try:
-            buffer = ""
             for chunk in stream_response(mode, input_text, user_response,
                                          config.get('model'), config.get('api_key'), all_modes=all_modes):
                 if chunk:
-                    clean_chunk = chunk.replace('\r', '').replace('\n', ' ')
+                    # --- FIX START ---
+                    # Remove the replace('\n', ' ')
+                    # Only clean carriage returns if they cause issues
+                    clean_chunk = chunk.replace('\r', '')
                     buffer += clean_chunk
-                    yield f"data: {buffer}\n\n"
+                    # Send the *entire updated* buffer.
+                    # JSON encode it to safely handle special characters (including \n)
+                    # in the event stream data field.
+                    yield f"data: {json.dumps(buffer)}\n\n"
+                    # --- FIX END ---
 
-            if buffer:
-                yield f"data: {buffer}\n\n"
+            # No need to yield buffer again here if the loop finished
             yield "data: [END]\n\n"
 
         except Exception as e:
-            yield f"data: Erreur: {str(e)}\n\n"
+            # Properly JSON encode the error message too
+            error_msg = json.dumps(f"Erreur: {str(e)}")
+            yield f"data: {error_msg}\n\n"
             yield "data: [END]\n\n"
 
     return Response(generate(), mimetype='text/event-stream')
@@ -185,6 +206,13 @@ def get_config():
             'model_name': ''
         })
     })
+
+@bp.errorhandler(500)
+def internal_server_error(error):
+    """
+    Gère les erreurs 500 (Internal Server Error) en affichant une page d'erreur personnalisée.
+    """
+    return render_template('500.html'), 500
 
 
 @bp.route('/api/config', methods=['POST'])

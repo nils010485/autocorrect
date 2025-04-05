@@ -68,7 +68,7 @@ def stream_response(mode_name: str, input_text: str, user_response: Optional[str
 def _stream_gemini(prompt: str, api_key: str) -> Generator[str, None, None]:
     """Gère le streaming pour les modèles Gemini."""
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-2.0-flash')
     safety_settings = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,

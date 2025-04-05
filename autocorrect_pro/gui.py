@@ -5,9 +5,9 @@ from PyQt6.QtCore import QUrl, pyqtSignal, QTimer, Qt
 from PyQt6.QtGui import QKeySequence, QShortcut, QIcon
 from pynput import keyboard
 from rich.console import Console
-
 from .config import ICON_PATH, DEFAULT_SHORTCUT
 from .utils import load_config, save_config
+import pyperclip
 
 console = Console()
 class MainWindow(QMainWindow):
@@ -22,6 +22,8 @@ class MainWindow(QMainWindow):
         self._setup_web_view(port)
         self.create_tray_icon()
         self.toggle_signal.connect(self._toggle_visibility)
+        self.port = port
+        self.clipboard_last_content = pyperclip.paste()
 
 
         try:
@@ -124,6 +126,18 @@ class MainWindow(QMainWindow):
             self.hide()
             self.is_visible = False
         else:
+            # Récupérer le contenu du presse-papiers
+            clipboard_content = pyperclip.paste()
+            if isinstance(clipboard_content, str) and len(clipboard_content) > 0 and clipboard_content != self.clipboard_last_content:
+                self.clipboard_last_content = clipboard_content
+                # Encoder le contenu pour l'URL
+                encoded_text = QUrl.toPercentEncoding(clipboard_content)
+
+                # Mettre à jour l'URL avec le texte du presse-papiers
+                new_url = QUrl(f"http://127.0.0.1:{self.port}/?text={encoded_text}")
+                self.web.setUrl(new_url)
+
+            # Afficher la fenêtre
             self.show()
             self.activateWindow()
             self.raise_()
