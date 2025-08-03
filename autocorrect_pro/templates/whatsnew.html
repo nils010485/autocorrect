@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouveautés - AI-AutoCorrect</title>
+{% extends "base.html" %}
+
+{% block head %}
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
@@ -26,6 +23,15 @@
             --border-color: #374151;
         }
 
+        /* Thème glass-dark */
+        :root[data-theme="glass-dark"] {
+            --bg-primary: rgba(31, 41, 55, 0.9);
+            --bg-secondary: rgba(17, 24, 39, 0.9);
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border-color: rgba(55, 65, 81, 0.5);
+        }
+
         body {
             background-color: var(--bg-primary);
             color: var(--text-primary);
@@ -34,43 +40,52 @@
 
         .theme-card {
             background-color: var(--bg-secondary);
-            border-color: var(--border-color);
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
         }
 
         .theme-text-secondary {
             color: var(--text-secondary);
         }
     </style>
-</head>
-<body>
+{% endblock %}
+
+{% block content %}
 <div class="min-h-screen flex items-center justify-center px-4">
     <div class="max-w-md w-full space-y-8 theme-card p-8 rounded-xl shadow-lg">
         <!-- En-tête -->
         <div class="text-center">
             <h1 class="text-2xl font-bold text-indigo-600 flex items-center justify-center">
-                <i class="fas fa-bell mr-2"></i>Quoi de neuf ?
+                <i class="fas fa-bell mr-2"></i>Quoi de neuf ? v2.5.1
             </h1>
-            <p class="mt-2 theme-text-secondary">Découvrez les dernières améliorations et fonctionnalités de la version
-                1.2.2</p>
+            <p class="mt-2 theme-text-secondary">Découvrez les dernières améliorations et corrections</p>
         </div>
 
         <!-- Liste des nouveautés -->
         <ul class="space-y-4 theme-text-secondary">
             <li class="flex items-start">
                 <i class="fas fa-paint-brush text-indigo-500 mr-3"></i>
-                <span>Amélioration du design</span>
+                <span>Amélioration des thèmes noir et glass dark</span>
             </li>
             <li class="flex items-start">
-                <i class="fas fa-robot text-indigo-500 mr-3"></i>
-                <span>Migration vers Gemini Flash 2.0 pour des réponses plus rapides et précises</span>
+                <i class="fas fa-brush text-indigo-500 mr-3"></i>
+                <span>Corrections de design mineures</span>
             </li>
             <li class="flex items-start">
-                <i class="fas fa-cogs text-indigo-500 mr-3"></i>
-                <span>Autres changements mineurs</span>
+                <i class="fas fa-info-circle text-indigo-500 mr-3"></i>
+                <span>Affichage du numéro de version dans les paramètres</span>
             </li>
             <li class="flex items-start">
-                <i class="fas fa-bug text-indigo-500 mr-3"></i>
-                <span>Correction d'un bug affectant les retours à la ligne</span>
+                <i class="fas fa-bolt text-indigo-500 mr-3"></i>
+                <span>Mises à jour rapides (moins de 5 secondes)</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-wifi text-indigo-500 mr-3"></i>
+                <span>Lancement possible sans connexion internet</span>
+            </li>
+            <li class="flex items-start">
+                <i class="fas fa-keyboard text-indigo-500 mr-3"></i>
+                <span>Correction du bug des raccourcis clavier dans le wizard</span>
             </li>
         </ul>
 
@@ -82,19 +97,8 @@
         </button>
     </div>
 </div>
+{% endblock %}
 
-<script>
-    // Fonction pour définir le thème
-    function setTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-    }
-
-    // Charger le thème sauvegardé
-    document.addEventListener('DOMContentLoaded', () => {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        setTheme(savedTheme);
-    });
-</script>
-</body>
-</html>
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/whatsnew.js') }}"></script>
+{% endblock %}

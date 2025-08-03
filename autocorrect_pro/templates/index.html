@@ -1,235 +1,68 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI-AutoCorrect Refresh</title>
+{% extends "base.html" %}
+
+{% block head %}
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+{% endblock %}
 
 
-</head>
-<body class="bg-slate-50">
-<!-- Barre latérale -->
-<div id="sidebar"
-     class="fixed top-0 right-0 h-full w-80 bg-white shadow-lg transform translate-x-full sidebar-transition z-50">
-    <div class="p-6">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-xl font-bold text-gray-800">Paramètres</h2>
-            <button id="closeSidebar" class="text-gray-500 hover:text-gray-700">
-                <i class="fas fa-times text-xl"></i>
-            </button>
-        </div>
 
-        <div class="space-y-6">
-            <!-- Section Clé API -->
-            <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-2">
-                    <i class="fas fa-key text-indigo-500 mr-2"></i>Clé API
-                </h3>
-                <div class="space-y-4">
-                    <div class="relative">
-                        <input type="password" id="apiKey"
-                               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input"
-                               placeholder="Entrez votre clé API">
-                        <button id="toggleApiKey"
-                                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <i class="fas fa-eye"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-2">
-                    <i class="fas fa-robot text-indigo-500 mr-2"></i>Modèle d'IA
-                </h3>
-                <select id="modelSelect"
-                        class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input">
-                    {% for model_id, model_info in models.items() %}
-                        <option value="{{ model_id }}" {% if model_id == current_model %}selected{% endif %}>
-                            {{ model_info.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-
-                <!-- Configuration endpoint personnalisé -->
-                <div id="customEndpointConfig" class="mt-4 hidden">
-                    <input type="text" id="customEndpointUrl"
-                           class="w-full px-4 py-2 mb-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                           placeholder="URL de l'endpoint (ex: http://127.0.0.1:9090/v1)">
-                    <input type="text" id="customEndpointModel"
-                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                           placeholder="Nom du modèle">
-                </div>
-            </div>
-
-            <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-2">
-                    <i class="fas fa-keyboard text-indigo-500 mr-2"></i>Raccourci Clavier
-                </h3>
-                <div class="relative">
-                    <input type="text" id="shortcutInput"
-                           class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input"
-                           placeholder="Entrez le raccourci clavier" value="{{ current_shortcut }}">
-                </div>
-            </div>
-
-            <!-- Section Thème -->
-            <div>
-                <h3 class="text-sm font-medium text-gray-700 mb-2">
-                    <i class="fas fa-paint-brush text-indigo-500 mr-2"></i>Thème
-                </h3>
-                <div class="relative">
-                    <select id="themeSelect"
-                            class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 floating-input">
-                        <option value="light">Thème clair</option>
-                        <option value="dark">Thème sombre</option>
-                    </select>
-                </div>
-            </div>
-
-
-            <!-- Bouton de sauvegarde -->
-            <div>
-                <button id="saveApiKey"
-                        class="w-full px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
-                    Sauvegarder la configuration
-                </button>
-            </div>
-            <!-- Bouton de byebye -->
-            <div>
-                <button id="deleteConfig"
-                        class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors mt-4 flex items-center justify-center">
-                    <i class="fas fa-trash-alt mr-2"></i>
-                    Supprimer la configuration
-                </button>
-            </div>
-
-
-            <!-- Section informative -->
-            <div class="border-t pt-6">
-                <p class="text-sm text-gray-600">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    Votre configuration est stockée localement et de manière sécurisée.
-                </p>
-            </div>
-
-            <!-- Section des modèles -->
-            <div class="border-t pt-6">
-                <h3 class="text-sm font-medium text-gray-700 mb-2">À propos des modèles</h3>
-                <div class="space-y-3">
-                    <div class="text-sm text-gray-600">
-                        <i class="fab fa-google text-blue-500 mr-2"></i>
-                        <strong>Gemini:</strong> Modèle de Google, rapide et efficace
-                    </div>
-                    <div class="text-sm text-gray-600">
-                        <i class="fas fa-brain text-green-500 mr-2"></i>
-                        <strong>Claude:</strong> Modèle d'Anthropic, précis et nuancé
-                    </div>
-                    <div class="text-sm text-gray-600">
-                        <i class="fas fa-robot text-purple-500 mr-2"></i>
-                        <strong>GPT-4:</strong> Modèle d'OpenAI, polyvalent
-                    </div>
-                </div>
-                <!-- Dans la div du sidebar, ajoutez ceci à la fin de la div class="space-y-6" -->
-
-                <!-- Section développeur -->
-                <div class="border-t pt-6 mt-6">
-                    <p class="text-sm text-gray-600 text-center">
-                        Développé par
-                        <a href="https://nils.begou.dev"
-                           target="_blank"
-                           rel="noopener noreferrer"
-                           class="text-indigo-600 hover:text-indigo-800 font-medium transition-colors hover:underline">
-                            Nils
-                        </a>
-                    </p>
-                </div>
-
-            </div>
-
-        </div>
-    </div>
-</div>
-
-
-<!-- En-tête -->
-<header class="fixed top-0 left-0 right-0 bg-white shadow-md z-40">
-    <div class="container mx-auto px-4 py-4">
-        <div class="flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-indigo-700">
-                <i class="fas fa-wand-magic-sparkles mr-2"></i>AI-AutoCorrect
-            </h1>
-            <div class="flex items-center space-x-4">
-                <a href="{{ url_for('main.edit_order_page') }}"
-                   class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <i class="fas fa-pen-fancy text-gray-600 text-xl"></i>
-                </a>
-                <button id="openSidebar" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                    <i class="fas fa-cog text-gray-600 text-xl"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-</header>
+{% block content %}
 
 <!-- Contenu principal -->
 <main class="container mx-auto px-4 pt-24 pb-12">
     <div class="max-w-3xl mx-auto">
-        <!-- Sélection du mode -->
-        <div class="mb-8 bg-white rounded-xl p-6 shadow-sm" data-aos="fade-up">
+        <!-- Sélection du mode avec fond adapté au thème glass-dark -->
+        <div class="mb-8 theme-card rounded-xl p-6 shadow-sm" data-aos="fade-up">
             <div class="flex justify-between items-center mb-4">
                 <label class="text-sm font-medium text-gray-700">Mode de traitement</label>
-                <div class="flex space-x-2">
-                    <button id="prevPage" class="p-2 text-gray-500 hover:text-indigo-600">
+                <div class="flex items-center space-x-3 bg-gray-100 px-3 py-1 rounded-lg pagination-container">
+                    <button id="prevPage" class="text-gray-500 hover:text-indigo-600 p-1">
                         <i class="fas fa-chevron-left"></i>
                     </button>
-                    <span id="pageIndicator" class="text-sm text-gray-600">Page <span id="currentPage">1</span>/<span
-                            id="totalPages">1</span></span>
-                    <button id="nextPage" class="p-2 text-gray-500 hover:text-indigo-600">
+                    <span id="pageIndicator" class="text-sm text-gray-600 min-w-[70px] text-center">
+                        <span id="currentPage">1</span>/<span id="totalPages">1</span>
+                    </span>
+                    <button id="nextPage" class="text-gray-500 hover:text-indigo-600 p-1">
                         <i class="fas fa-chevron-right"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- Page 1 -->
+            <!-- Conteneur des modes -->
             <div id="modesContainer">
-                {% set modes_per_page = 3 %}
+                {% set modes_per_page = 4 %}
                 {% set total_modes = modes|length %}
                 {% set total_pages = ((total_modes - 1) // modes_per_page) + 1 %}
 
                 {% for page in range(total_pages) %}
                     <div id="modePage{{ page + 1 }}"
-                         class="grid grid-cols-2 md:grid-cols-3 gap-4 {% if page != 0 %}hidden{% endif %}">
+                         class="grid grid-cols-2 md:grid-cols-4 gap-3 {% if page != 0 %}hidden{% endif %}">
                         {% for mode_id, mode in modes.items() %}
                             {% if loop.index0 // modes_per_page == page %}
-                                <button class="mode-button p-4 rounded-lg border-2 border-transparent hover:border-indigo-300 hover:bg-indigo-50 transition-all text-center hover-shadow"
+                                <button class="mode-button flex flex-col items-center justify-center p-4 rounded-xl border border-gray-200 hover:border-indigo-300 bg-white hover:bg-indigo-50 transition-all group"
                                         data-mode="{{ mode_id }}">
-                                    <i class="fas {{ mode.icon }} text-xl mb-2 text-indigo-500"></i>
-                                    <div class="text-sm font-medium">{{ mode.title }}</div>
+                                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mb-3 group-hover:bg-indigo-200 transition-colors">
+                                        <i class="fas {{ mode.icon }} text-base text-indigo-600"></i>
+                                    </div>
+                                    <div class="text-sm font-medium text-gray-800 group-hover:text-indigo-600">{{ mode.title }}</div>
                                 </button>
                             {% endif %}
                         {% endfor %}
                     </div>
                 {% endfor %}
 
-                <script>
-                    document.getElementById('totalPages').textContent = '{{ total_pages }}';
-                </script>
             </div>
-
         </div>
 
 
-        <!-- Zone de texte -->
-        <div class="bg-white rounded-xl p-6 shadow-sm mb-8" data-aos="fade-up" data-aos-delay="100">
-            <label for="input_text" class="block text-sm font-medium text-gray-700 mb-2">
+        <!-- Zone de texte avec fond adapté au thème glass-dark -->
+        <div class="theme-card rounded-xl p-6 shadow-sm mb-8" data-aos="fade-up" data-aos-delay="100">
+            <label for="input_text" class="block text-sm font-medium text-indigo-200 mb-2">
                 <i class="fas fa-pen-fancy mr-2 text-indigo-400"></i>Texte à traiter
             </label>
             <div class="relative">
@@ -250,7 +83,8 @@
                        onChange="handleAudioFile(this)">
             </div>
             <button id="submit-btn"
-                    class="mt-4 w-full py-3 px-6 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center shadow-lg hover:shadow-xl">
+                    class="mt-4 w-full py-3 px-6 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors flex items-center justify-center shadow-lg hover:shadow-xl disabled:bg-indigo-400 disabled:hover:bg-indigo-400 disabled:cursor-not-allowed"
+                    disabled>
                 <i class="fas fa-magic mr-2"></i>
                 Traiter le texte
             </button>
@@ -268,9 +102,8 @@
         </div>
 
         <!-- Indicateur de chargement -->
-        <!-- Remplacer le div loading actuel par : -->
-        <div id="loading" class="hidden">
-            <div class="flex items-center justify-center space-x-6 bg-white rounded-xl p-6 shadow-sm">
+        <div id="loading" class="hidden theme-card rounded-xl p-6 shadow-sm" data-aos="fade-up" data-aos-delay="300">
+            <div class="flex items-center justify-center space-x-6">
                 <div class="network-loader">
                     <div class="particles">
                         <div class="particle p1"></div>
@@ -284,26 +117,31 @@
                         </div>
                     </div>
                 </div>
-                <span class="text-gray-600">Traitement en cours...</span>
+                <span class="text-gray-600 dark:text-indigo-200">Traitement en cours...</span>
             </div>
         </div>
 
-        <!-- Résultat -->
-        <div id="result" class="hidden bg-white rounded-xl p-6 shadow-sm" data-aos="fade-up" data-aos-delay="200">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <i class="fas fa-check-circle text-green-500 mr-2"></i>
-                Résultat
-            </h2>
-            <div id="result-text" class="prose max-w-none mb-4 text-gray-700"></div>
+        <!-- Résultat amélioré (fond adapté au thème) -->
+        <div id="result" class="hidden theme-card rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700" data-aos="fade-up" data-aos-delay="200">
+            <div class="flex justify-between items-start mb-4">
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-indigo-200 flex items-center">
+                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                    Résultat
+                </h2>
+                <button id="close-result" class="text-gray-500 dark:text-indigo-300 hover:text-gray-700 dark:hover:text-indigo-100 p-1">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="result-text" class="prose max-w-none mb-6 text-gray-700 bg-gray-50 rounded-xl p-4 border border-gray-200"></div>
 
             <!-- Boutons Copier et Retour -->
-            <div id="result-buttons" class="hidden flex space-x-4 mt-4">
+            <div id="result-buttons" class="flex space-x-3">
                 <button id="copy-button"
-                        class="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">
+                        class="flex-1 px-4 py-3 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors flex items-center justify-center shadow-md hover:shadow-lg">
                     <i class="fas fa-copy mr-2"></i> Copier
                 </button>
                 <button id="back-button"
-                        class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                        class="flex-1 px-4 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-colors flex items-center justify-center shadow-md hover:shadow-lg">
                     <i class="fas fa-arrow-left mr-2"></i> Retour
                 </button>
             </div>
@@ -312,577 +150,69 @@
     </div>
 </main>
 <input type="hidden" id="selectedMode" name="mode" value="corriger">
+{% endblock %}
+
+{% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
-
+<script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
 <script>
-    // Initialisation AOS
-    AOS.init({
-        duration: 800,
-        once: true,
-        easing: 'ease-out-cubic'
-    });
-
-    // CHARGEMENT DU THEME
-    document.addEventListener('DOMContentLoaded', function () {
-        // Charger le thème sauvegardé
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        setTheme(savedTheme);
-        document.getElementById('themeSelect').value = savedTheme;
-
-        // Charger la configuration initiale
-        fetch('/api/config')
-            .then(response => response.json())
-            .then(data => {
-                if (data.theme) {
-                    setTheme(data.theme);
-                    document.getElementById('themeSelect').value = data.theme;
-                }
-                if (data.shortcut) {
-                    document.getElementById('shortcutInput').value = data.shortcut;
-                }
-            });
-
-        // Gestion de la pagination sur 3 pages
-        const pages = document.querySelectorAll('[id^="modePage"]');
-        const totalPages = parseInt(document.getElementById('totalPages').textContent);
-
-        let currentPage = 1;
-
-        function updatePageVisibility() {
-            pages.forEach(page => page.classList.add('hidden'));
-            document.getElementById(`modePage${currentPage}`).classList.remove('hidden');
-            document.getElementById('currentPage').textContent = currentPage;
-        }
-
-        document.getElementById('prevPage').addEventListener('click', () => {
-            currentPage = currentPage === 1 ? totalPages : currentPage - 1;
-            updatePageVisibility();
-        });
-
-        document.getElementById('nextPage').addEventListener('click', () => {
-            currentPage = currentPage === totalPages ? 1 : currentPage + 1;
-            updatePageVisibility();
-        });
-
-        // Initialisation
-        updatePageVisibility();
-    });
-    // Custom endpoint
-    document.getElementById('modelSelect').addEventListener('change', function () {
-        const customEndpointConfig = document.getElementById('customEndpointConfig');
-        if (this.value === 'custom') {
-            customEndpointConfig.classList.remove('hidden');
-        } else {
-            customEndpointConfig.classList.add('hidden');
-        }
-    });
-
-    // Gestion de la barre latérale
-    const sidebar = document.getElementById('sidebar');
-    const openSidebarBtn = document.getElementById('openSidebar');
-    const closeSidebarBtn = document.getElementById('closeSidebar');
-    const apiKeyInput = document.getElementById('apiKey');
-    const toggleApiKeyBtn = document.getElementById('toggleApiKey');
-    const saveApiKeyBtn = document.getElementById('saveApiKey');
-    const shortcutInput = document.getElementById('shortcutInput');
-
-    function setTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
+    // Déplacer la fonction en dehors pour une portée globale
+    function updateSubmitButton() {
+        const inputText = document.getElementById('input_text');
+        const submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = !inputText.value.trim();
     }
 
-    // Theme ici
-    document.getElementById('themeSelect').addEventListener('change', function () {
-        const theme = this.value;
-        setTheme(theme);
-    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputText = document.getElementById('input_text');
+        
+        // Restore saved text
+        const savedText = localStorage.getItem('autocorrect_input_text');
+        if (savedText) {
+            inputText.value = savedText;
+        }
+        
+        // Mettre à jour l'état initial du bouton
+        updateSubmitButton();
+        
+        // Update on input
+        inputText.addEventListener('input', function() {
+            localStorage.setItem('autocorrect_input_text', inputText.value);
+            updateSubmitButton();
+        });
 
-    // Dans la partie où on charge la configuration existante
-    openSidebarBtn.addEventListener('click', () => {
-        sidebar.classList.remove('translate-x-full');
-        sidebar.classList.add('translate-x-0');
-
-        // Charger la configuration existante
-        fetch('/api/config')
-            .then(response => response.json())
-            .then(data => {
-                if (data.has_key) {
-                    apiKeyInput.value = data.api_key;
-                }
-                if (data.model) {
-                    document.getElementById('modelSelect').value = data.model;
-                    // Afficher/masquer les champs d'endpoint personnalisé si nécessaire
-                    const customEndpointConfig = document.getElementById('customEndpointConfig');
-                    if (data.model === 'custom') {
-                        customEndpointConfig.classList.remove('hidden');
-                        // Remplir les champs avec les valeurs sauvegardées
-                        if (data.custom_endpoint) {
-                            document.getElementById('customEndpointUrl').value = data.custom_endpoint.url || '';
-                            document.getElementById('customEndpointModel').value = data.custom_endpoint.model_name || '';
+        // Écoute du signal du pont pour le texte du presse-papiers
+        new QWebChannel(qt.webChannelTransport, function(channel) {
+            var pywebview = channel.objects.pywebview;
+            pywebview.clipboard_text_signal.connect(function(text) {
+                const clipboardBehavior = localStorage.getItem('clipboard_behavior') || 'ask';
+                if (clipboardBehavior === 'always') {
+                    inputText.value = text;
+                    localStorage.setItem('autocorrect_input_text', text);
+                    updateSubmitButton();
+                } else if (clipboardBehavior === 'ask') {
+                    Swal.fire({
+                        title: 'Texte détecté dans le presse-papiers',
+                        text: 'Voulez-vous coller le texte dans la zone de saisie ?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#6366f1',
+                        cancelButtonColor: '#f87171',
+                        confirmButtonText: 'Oui, coller',
+                        cancelButtonText: 'Non, ignorer'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            inputText.value = text;
+                            localStorage.setItem('autocorrect_input_text', text);
+                            updateSubmitButton();
                         }
-                    } else {
-                        customEndpointConfig.classList.add('hidden');
-                    }
-                }
-                if (data.theme) {
-                    document.getElementById('themeSelect').value = data.theme;
-                    setTheme(data.theme);
-                }
-                if (data.shortcut) {
-                    shortcutInput.value = data.shortcut;
-                }
-            });
-    });
-
-
-    closeSidebarBtn.addEventListener('click', () => {
-        sidebar.classList.remove('translate-x-0');
-        sidebar.classList.add('translate-x-full');
-    });
-
-    // Gestion de l'affichage de la clé API
-    toggleApiKeyBtn.addEventListener('click', () => {
-        const type = apiKeyInput.type === 'password' ? 'text' : 'password';
-        apiKeyInput.type = type;
-        toggleApiKeyBtn.innerHTML = `<i class="fas fa-eye${type === 'password' ? '' : '-slash'}"></i>`;
-    });
-
-    shortcutInput.addEventListener('keydown', (event) => {
-        event.preventDefault(); // Empêche le comportement par défaut
-        const keys = [];
-        if (event.ctrlKey) keys.push('Ctrl');
-        if (event.altKey) keys.push('Alt');
-        if (event.shiftKey) keys.push('Shift');
-        if (event.metaKey) keys.push('Meta');
-        if (event.key && !['Control', 'Alt', 'Shift', 'Meta'].includes(event.key)) {
-            // Gestion spéciale pour la touche espace
-            if (event.key === ' ' || event.key === 'Space') {
-                keys.push('Space');
-            } else {
-                keys.push(event.key.charAt(0).toUpperCase() + event.key.slice(1));
-            }
-        }
-        shortcutInput.value = keys.join('+');
-    });
-
-    // Sauvegarde de la configuration
-    saveApiKeyBtn.addEventListener('click', async () => {
-        const apiKey = apiKeyInput.value.trim();
-        const selectedModel = document.getElementById('modelSelect').value;
-        const selectedTheme = document.getElementById('themeSelect').value;
-        const newShortcut = shortcutInput.value.trim();
-
-        // Récupérer la configuration actuelle depuis le serveur
-        try {
-            const response = await fetch('/api/config');
-            const currentConfig = await response.json();
-            const currentShortcut = currentConfig.shortcut;
-
-            // Normaliser les raccourcis pour la comparaison
-            const normalizeShortcut = (shortcut) => {
-                return shortcut.split('+')
-                    .map(key => key.trim())
-                    .filter(key => key)
-                    .join('+');
-            };
-
-            const normalizedNew = normalizeShortcut(newShortcut);
-            const normalizedCurrent = normalizeShortcut(currentShortcut);
-
-            if (normalizedNew !== normalizedCurrent) {
-                showAlert(
-                    'Changement de raccourci',
-                    'L\'application va redémarrer pour appliquer le nouveau raccourci.',
-                    'info'
-                ).then((result) => {
-                    if (result.isConfirmed) {
-                        saveConfig(apiKey, selectedModel, selectedTheme, newShortcut);
-                    }
-                });
-            } else {
-                saveConfig(apiKey, selectedModel, selectedTheme, currentShortcut);
-            }
-        } catch (error) {
-            console.error('Erreur lors de la récupération de la configuration:', error);
-            saveConfig(apiKey, selectedModel, selectedTheme, newShortcut);
-        }
-    });
-
-    function saveConfig(apiKey, selectedModel, selectedTheme, newShortcut) {
-        const config = {
-            api_key: apiKey,
-            model: selectedModel,
-            theme: selectedTheme,
-            shortcut: newShortcut
-        };
-
-        if (selectedModel === 'custom') {
-            config.custom_endpoint_url = document.getElementById('customEndpointUrl').value;
-            config.custom_endpoint_model = document.getElementById('customEndpointModel').value;
-        }
-
-        fetch('/api/config', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(config)
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showSuccessAlert();
-                    sidebar.classList.add('translate-x-full');
-                } else {
-                    showErrorAlert();
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showErrorAlert();
-            });
-    }
-
-    // Sélection du mode
-    const modeButtons = document.querySelectorAll('.mode-button');
-    const selectedModeInput = document.getElementById('selectedMode');
-
-    modeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            modeButtons.forEach(btn => btn.classList.remove('border-indigo-500', 'bg-indigo-50'));
-            button.classList.add('border-indigo-500', 'bg-indigo-50');
-            selectedModeInput.value = button.dataset.mode;
-
-            // Afficher ou masquer la section de réponse en fonction du mode
-            if (button.dataset.mode === 'repondre') {
-                document.getElementById('response-section').classList.remove('hidden');
-            } else {
-                document.getElementById('response-section').classList.add('hidden');
-            }
-        });
-    });
-
-    // Traitement du texte
-    const submitBtn = document.getElementById('submit-btn');
-    const loading = document.getElementById('loading');
-    const result = document.getElementById('result');
-    const resultText = document.getElementById('result-text');
-    const copyButton = document.getElementById('copy-button');
-    const inputText = document.getElementById('input_text');
-
-    submitBtn.addEventListener('click', async function (e) {
-        e.preventDefault();
-        submitBtn.disabled = true;
-        loading.classList.remove('hidden');
-        result.classList.add('hidden');
-        resultText.innerHTML = '';
-
-        const formData = new FormData();
-        formData.append('mode', selectedModeInput.value);
-        formData.append('input_text', inputText.value);
-
-        if (selectedModeInput.value === 'repondre') {
-            const userResponse = document.getElementById('response_text').value;
-            formData.append('user_response', userResponse);
-        }
-
-        try {
-            const response = await fetch('/process', {
-                method: 'POST',
-                body: formData
-            });
-
-            loading.classList.add('hidden');
-            result.classList.remove('hidden');
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-
-            while (true) {
-                const {value, done} = await reader.read();
-                if (done) break;
-
-                const chunk = decoder.decode(value);
-                const lines = chunk.split('\n');
-
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const rawData = line.slice(6); // Get the raw data string
-                        if (rawData === '[END]') {
-                            submitBtn.disabled = false;
-                            AOS.refresh();
-                            document.getElementById('result-buttons').classList.remove('hidden');
-                            return; // Exit the loop
-                        }
-                        try {
-                            // Parse the JSON data received from the server
-                            const jsonData = JSON.parse(rawData);
-                            console.log("Received data:", jsonData); // Now jsonData is the actual string
-
-                            // Replace \n with <br> for HTML rendering using the parsed string
-                            const htmlContent = jsonData.replace(/\n/g, '<br>');
-                            resultText.innerHTML = htmlContent;
-
-                        } catch (e) {
-                            console.error("Failed to parse JSON data:", rawData, e);
-                            // Fallback for non-JSON data (like the error message or [END])
-                            // or if the server didn't send JSON for some reason
-                            const htmlContent = rawData.replace(/\n/g, '<br>');
-                            resultText.innerHTML = htmlContent;
-                        }
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('Fetch error:', error);
-            loading.classList.add('hidden');
-            submitBtn.disabled = false;
-            alert('Une erreur est survenue lors du traitement.');
-        }
-    });
-
-    // Gestion du bouton "Retour"
-    document.getElementById('back-button').addEventListener('click', function () {
-        result.classList.add('hidden');
-        document.getElementById('result-buttons').classList.add('hidden');
-        inputText.value = resultText.textContent;
-        inputText.parentElement.classList.remove('hidden');
-    });
-
-    // Copie dans le presse-papiers
-    copyButton.addEventListener('click', function () {
-    // --- MODIFICATION ICI ---
-    // 1. Récupérer le contenu HTML de la zone de résultat
-    const resultHtml = resultText.innerHTML;
-
-    // 2. Remplacer toutes les occurrences de <br> (et ses variantes) par \n
-    //    Le regex /<br\s*\/?>/gi gère <br>, <br/>, <br />, insensible à la casse (i) et globalement (g)
-    const textToCopy = resultHtml.replace(/<br\s*\/?>/gi, '\n');
-    // --- FIN MODIFICATION ---
-
-    console.log("Text being sent to /copy:", JSON.stringify(textToCopy)); // Pour déboguer
-
-    fetch('/copy', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text: textToCopy }) // Envoie le texte avec les \n reconstruits
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            copyButton.innerHTML = '<i class="fas fa-check mr-2"></i>Copié !';
-            setTimeout(() => {
-                copyButton.innerHTML = '<i class="fas fa-copy mr-2"></i>Copier';
-            }, 2000);
-        } else {
-            console.error("Copy failed:", data.error);
-            copyButton.innerHTML = '<i class="fas fa-times mr-2"></i>Erreur';
-             setTimeout(() => {
-                copyButton.innerHTML = '<i class="fas fa-copy mr-2"></i>Copier';
-            }, 2000);
-        }
-    })
-    .catch(error => {
-         console.error("Copy request failed:", error);
-         copyButton.innerHTML = '<i class="fas fa-times mr-2"></i>Erreur';
-         setTimeout(() => {
-            copyButton.innerHTML = '<i class="fas fa-copy mr-2"></i>Copier';
-         }, 2000);
-    });
-});
-
-    // Initialisation au chargement de la page
-    document.addEventListener('DOMContentLoaded', function () {
-        // Activation du mode "corriger" par défaut
-        const defaultModeButton = document.querySelector('[data-mode="corriger"]');
-        if (defaultModeButton) {
-            defaultModeButton.classList.add('border-indigo-500', 'bg-indigo-50');
-        }
-
-        // Ajout de l'indicateur de modèle
-        const modelSelect = document.getElementById('modelSelect');
-        const modelIndicator = document.createElement('div');
-        modelIndicator.className = 'text-sm text-gray-600 mb-4 bg-white rounded-xl p-4 shadow-sm';
-        modelIndicator.innerHTML = `<i class="fas fa-robot mr-2"></i>Modèle actif : <span class="font-medium">${modelSelect.options[modelSelect.selectedIndex].text}</span>`;
-
-        // Insertion après le header et avant la section des modes
-        const modeSection = document.querySelector('.mode-button').closest('.mb-8');
-        modeSection.parentNode.insertBefore(modelIndicator, modeSection);
-
-        // Mise à jour de l'indicateur lors du changement de modèle
-        modelSelect.addEventListener('change', function () {
-            modelIndicator.innerHTML = `<i class="fas fa-robot mr-2"></i>Modèle actif : <span class="font-medium">${this.options[this.selectedIndex].text}</span>`;
-        });
-    });
-
-    // On Alerte JS avec thème
-    function showAlert(title, text, icon, showCancelButton = false) {
-        const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
-
-        return Swal.fire({
-            title: title,
-            text: text,
-            icon: icon,
-            showCancelButton: showCancelButton,
-            confirmButtonColor: '#6366f1',
-            cancelButtonColor: '#f87171',
-            confirmButtonText: 'OK',
-            cancelButtonText: 'Annuler',
-            customClass: isDarkTheme ? {
-                popup: 'swal2-dark',
-                title: 'swal2-title-dark',
-                content: 'swal2-content-dark',
-                confirmButton: 'swal2-confirm-dark',
-                cancelButton: 'swal2-cancel-dark'
-            } : {
-                popup: 'swal2-light',
-                title: 'swal2-title-light',
-                content: 'swal2-content-light',
-                confirmButton: 'swal2-confirm-light',
-                cancelButton: 'swal2-cancel-light'
-            }
-        });
-    }
-
-    // Utilisation pour une alerte de succès
-    function showSuccessAlert() {
-        showAlert('Succès', 'Configuration sauvegardée avec succès !', 'success');
-    }
-
-    // Utilisation pour une alerte d'erreur
-    function showErrorAlert() {
-        showAlert('Erreur', 'Erreur lors de la sauvegarde de la configuration', 'error');
-    }
-
-    document.getElementById('microphone-btn').addEventListener('click', function () {
-        // Vérifier d'abord si on utilise OpenAI
-        const modelSelect = document.getElementById('modelSelect');
-        const selectedProvider = modelSelect.options[modelSelect.selectedIndex].value;
-
-        if (!selectedProvider.includes('gpt') && selectedProvider !== 'custom') {
-            showAlert(
-                'Fonctionnalité non disponible',
-                'La transcription audio nécessite une clé API OpenAI.',
-                'warning'
-            );
-            return;
-        }
-
-        document.getElementById('audio-file').click();
-    });
-
-    function handleAudioFile(input) {
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-
-            // Créer un FormData pour envoyer le fichier
-            const formData = new FormData();
-            formData.append('audio', file);
-
-            // Montrer un indicateur de chargement
-            Swal.fire({
-                title: 'Transcription en cours',
-                text: 'Veuillez patienter pendant la transcription du fichier audio...',
-                icon: 'info',
-                allowOutsideClick: false,
-                showConfirmButton: false,
-                willOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            // Envoyer le fichier au serveur
-            fetch('/transcribe', {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(data => {
-                    Swal.close();
-                    if (data.success) {
-                        document.getElementById('input_text').value = data.text;
-                        showAlert(
-                            'Succès',
-                            'Transcription terminée !',
-                            'success'
-                        );
-                    } else {
-                        showAlert(
-                            'Erreur',
-                            data.error || 'Erreur lors de la transcription',
-                            'error'
-                        );
-                    }
-                })
-                .catch(error => {
-                    Swal.close();
-                    showAlert(
-                        'Erreur',
-                        'Erreur lors de la transcription: ' + error,
-                        'error'
-                    );
-                });
-        }
-    }
-
-    // Gestion de la suppression de la configuration
-    const deleteConfigBtn = document.getElementById('deleteConfig');
-
-    deleteConfigBtn.addEventListener('click', () => {
-        showAlert(
-            'Êtes-vous sûr ?',
-            "Cela supprimera votre clé API et réinitialisera le modèle.",
-            'warning',
-            true
-        ).then((result) => {
-            if (result.isConfirmed) {
-                fetch('/api/config', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        api_key: '', // Réinitialiser la clé API
-                        model: 'gemini-1.5-flash' // Réinitialiser au modèle par défaut
-                    })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Réinitialiser les champs
-                            apiKeyInput.value = '';
-                            document.getElementById('modelSelect').value = 'gemini-1.5-flash';
-
-                            // Fermer la sidebar
-                            sidebar.classList.add('translate-x-full');
-
-                            // Potentiellement recharger la page pour montrer l'écran de configuration
-                            window.location.reload();
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Erreur',
-                                text: 'Erreur lors de la suppression de la configuration',
-                                confirmButtonColor: '#f87171'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Erreur',
-                            text: 'Erreur lors de la suppression de la configuration',
-                            confirmButtonColor: '#f87171'
-                        });
                     });
-            }
+                }
+                // Si 'never', on ne fait rien
+            });
         });
+
     });
-
 </script>
-
-</body>
-</html>
+{% endblock %}

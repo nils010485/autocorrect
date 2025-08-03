@@ -15,7 +15,7 @@ CONFIG_FILE = CONFIG_DIR / "gemini.json"
 ICON_PATH = Path(__file__).resolve().parent / 'static' / 'favicon.ico'
 
 # Configuration générale
-CURRENT_VERSION = 13
+CURRENT_VERSION = 16
 DEFAULT_SHORTCUT = "Ctrl+Space"
 
 # Configuration des modèles AI
@@ -163,7 +163,7 @@ Instructions détaillées :
 Entrées :
 Message reçu : {original_message}
 Éléments de réponse : {user_response}
-Format de sortie : 
+Format de sortie :
 Réponse au message originel formatée et avec une bonne syntaxe uniquement, sans métadonnées ni explications""",
         "order": 7,
         "page": 3,
@@ -198,6 +198,8 @@ DEFAULT_CONFIG = {
         'model_name': ''
     }
 }
+
+AVAILABLE_THEMES = ['light', 'dark', 'glass-light', 'glass-dark', 'pastel']
 
 CUSTOM_MODES_SCHEMA = {
     "version": CURRENT_VERSION,

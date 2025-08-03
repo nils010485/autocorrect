@@ -18,7 +18,7 @@
 }
 
 /* ========== DARK THEME ========== */
-[data-theme="dark"] {
+[data-theme="dark"]:not([data-theme*="glass"]) {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
   --text-primary: #f8fafc;
@@ -48,12 +48,15 @@ body {
   font-smooth: always;
 }
 
+/* Special rules for glass themes */
+[data-theme*="glass"] body {
+  background-color: transparent;
+}
+
 /* Smooth transitions for theme changes */
-/** {
-  transition: background-color 0.3s ease,
-              border-color 0.3s ease,
-              color 0.3s ease;
-}*/
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
 
 /* ========== TYPOGRAPHY ========== */
 h1, h2, h3, h4, h5, h6 {
@@ -84,23 +87,31 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 25px -5px var(--shadow-color),
-              0 10px 10px -5px var(--shadow-color);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 25px -5px var(--shadow-color),
+              0 5px 10px -5px var(--shadow-color);
 }
 
 /* ========== BUTTONS ========== */
 button {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
 }
 
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 button:active:not(:disabled) {
-  transform: scale(0.96);
+  transform: scale(0.96) translateY(0);
+  box-shadow: none;
 }
 
 /* ========== FORMS ========== */
 .floating-input {
+  -webkit-appearance: none;
+  appearance: none;
   background-color: var(--input-bg);
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
@@ -134,11 +145,17 @@ button:active:not(:disabled) {
 
 .icon-button:hover {
   background-color: var(--hover-bg);
-  transform: scale(1.1);
+  transform: scale(1.1) rotate(5deg);
 }
 
-.icon-button.active {
+.nav-link.active-link {
   background-color: var(--indigo-primary);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .nav-link.active-link {
+  background-color: var(--indigo-secondary);
   color: white;
 }
 
@@ -170,14 +187,21 @@ button:active:not(:disabled) {
 }
 
 .mode-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 15px -3px var(--shadow-color);
+  transform: translateY(-5px);
+  box-shadow: 0 15px 25px -3px var(--shadow-color);
   border-color: var(--indigo-primary);
 }
 
 .mode-button.active {
   border-color: var(--indigo-primary);
   background-color: rgba(99, 102, 241, 0.05);
+  box-shadow: 0 0 0 2px var(--indigo-primary);
+}
+
+[data-theme="dark"] .mode-button.active {
+  border-color: var(--indigo-primary);
+  background-color: rgba(99, 102, 241, 0.05);
+  box-shadow: 0 0 0 2px var(--indigo-primary);
 }
 
 /* ========== UTILITY CLASSES ========== */
@@ -198,12 +222,21 @@ button:active:not(:disabled) {
 
 /* ========== ANIMATIONS ========== */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .fade-in {
   animation: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
 }
 
 @keyframes pulse {
@@ -233,6 +266,38 @@ button:active:not(:disabled) {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
 }
+
+/* ========== PAGINATION CONTAINER ========== */
+.pagination-container {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.pagination-container span, .pagination-container button {
+    color: var(--text-secondary);
+}
+
+.pagination-container button:hover {
+    color: var(--indigo-primary);
+}
+
+[data-theme*="glass"] .pagination-container {
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="glass-dark"] .pagination-container {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="glass-dark"] .pagination-container span,
+[data-theme="glass-dark"] .pagination-container button {
+    color: var(--text-primary);
+}
+
 
 /* ========== HEADER & NAVIGATION ========== */
 header {
@@ -304,6 +369,10 @@ header {
 .p4 { bottom: 0; left: 50%; transform: translateX(-50%); }
 .p5 { bottom: 25%; left: 10%; }
 .p6 { top: 25%; left: 10%; }
+
+.mode-button.active {
+  box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.8);
+}
 
 /* Animation des particules */
 .particle {
@@ -425,7 +494,6 @@ header {
 
 /* ========== RESULT SECTION ========== */
 #result {
-  background-color: var(--bg-secondary);
   border-radius: 1rem;
   box-shadow: 0 4px 6px -1px var(--shadow-color),
               0 2px 4px -1px var(--shadow-color);
@@ -434,6 +502,8 @@ header {
 
 #result-text {
   color: var(--text-primary);
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
 }
 
 /* ========== SWEETALERT CUSTOMIZATION ========== */
@@ -460,6 +530,12 @@ header {
   background-color: #f87171 !important;
   color: #ffffff !important;
   border: none;
+}
+
+/* ========== DISABLED BUTTON STYLES ========== */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ========== MICROPHONE BUTTON ========== */
@@ -513,6 +589,12 @@ header {
   background-color: var(--input-bg) !important;
   border-color: var(--border-color) !important;
   color: var(--text-primary) !important;
+}
+
+/* Ensure dropdown text is visible in glass-dark theme */
+[data-theme="glass-dark"] .floating-input,
+[data-theme="glass-dark"] select {
+    color: #1e293b !important;
 }
 
 [data-theme="dark"] .mode-button {
@@ -608,7 +690,12 @@ header {
   opacity: 0.7;
 }
 
-[data-theme="dark"] .focus\:ring-2:focus {
+[data-theme="light"] .focus\:ring-2:focus {
   --tw-ring-color: var(--indigo-primary);
   --tw-ring-opacity: 0.5;
 }
+
+
+/* ========== GLASS THEME CORE EFFECT ========== */
+/* Moved to glass-light.css and glass-dark.css for better control */
+

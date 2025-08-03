@@ -6,10 +6,11 @@ from flask import Blueprint, render_template, request, jsonify, Response
 import pyperclip
 from openai import OpenAI
 
-from .config import MODES, AVAILABLE_MODELS, CURRENT_VERSION, DEFAULT_SHORTCUT, CONFIG_FILE
+from .config import MODES, AVAILABLE_MODELS, CURRENT_VERSION, DEFAULT_SHORTCUT, CONFIG_FILE, AVAILABLE_THEMES
 from .utils import load_config, save_config, restart_application, load_modes
 from .models import stream_response
 from .utils import validate_audio_file
+from bs4 import BeautifulSoup
 
 bp = Blueprint('main', __name__)
 
@@ -54,6 +55,22 @@ def index():
                            current_theme=config.get('theme', 'light'),
                            has_api_key=bool(config.get('api_key')),
                            text_from_url=text_from_url)  # Passer le texte à la vue
+
+@bp.route('/settings')
+def settings_page():
+    """Page de paramètres de l'application."""
+    config = load_config()
+    # Vérifier si la clé API est présente
+    if not config.get('api_key'):
+        return render_template('wizzard.html',
+                               models=AVAILABLE_MODELS)
+
+    return render_template('settings.html',
+                           models=AVAILABLE_MODELS,
+                           current_model=config.get('model'),
+                           current_shortcut=config.get('shortcut', DEFAULT_SHORTCUT),
+                           current_theme=config.get('theme', 'light'),
+                           available_themes=AVAILABLE_THEMES)
 
 @bp.route('/restart', methods=['GET'])
 def restart_endpoint():
@@ -105,15 +122,31 @@ def process():
     return Response(generate(), mimetype='text/event-stream')
 
 
+
+
 @bp.route('/copy', methods=['POST'])
 def copy():
-    """Copie le texte dans le presse-papiers."""
+    """
+    Copie le texte dans le presse-papiers.
+    Extrait le contenu textuel si l'entrée est du HTML.
+    """
     data = request.json
-    text = data.get('text', '')
+    html_or_plain_text = data.get('text', '') # Le texte reçu (peut être HTML)
+
     try:
-        pyperclip.copy(text)
+        # 1. Analyser le texte avec BeautifulSoup
+        soup = BeautifulSoup(html_or_plain_text, 'html.parser')
+        # 2. Obtenir uniquement le texte brut
+        plain_text = soup.get_text()
+        # --- Fin de la modification ---
+
+        # 3. Copier le texte extrait (plain_text) au lieu de l'original
+        pyperclip.copy(plain_text)
+
+        # Réponse originale en cas de succès
         return jsonify({'success': True})
     except Exception as e:
+        # Gestion d'erreur originale
         return jsonify({'success': False, 'error': str(e)})
 
 
@@ -195,16 +228,17 @@ def transcribe():
 def get_config():
     """Récupère la configuration actuelle."""
     config = load_config()
+    custom_endpoint = config.get('custom_endpoint', {
+        'url': '',
+        'model_name': ''
+    })
     return jsonify({
         'has_key': bool(config.get('api_key')),
         'api_key': config.get('api_key'),
         'model': config.get('model'),
         'theme': config.get('theme', 'light'),
         'shortcut': config.get('shortcut', DEFAULT_SHORTCUT),
-        'custom_endpoint': config.get('custom_endpoint', {
-            'url': '',
-            'model_name': ''
-        })
+        'custom_endpoint': custom_endpoint
     })
 
 @bp.errorhandler(500)
@@ -269,6 +303,15 @@ def edit_order_page():
     """Page d'édition de l'ordre des modes."""
     config = load_config()
     return render_template('edit_order.html',
+                           current_theme=config.get('theme', 'light'))
+
+
+@bp.route('/whatsnew')
+def whatsnew_page():
+    """Page des nouveautés."""
+    config = load_config()
+    return render_template('whatsnew.html',
+                           current_version=CURRENT_VERSION,
                            current_theme=config.get('theme', 'light'))
 
 

@@ -1,8 +1,9 @@
 # gui.py
 from PyQt6.QtWidgets import QMainWindow, QApplication, QSystemTrayIcon, QMenu
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtCore import QUrl, pyqtSignal, QTimer, Qt
+from PyQt6.QtCore import QUrl, pyqtSignal, QTimer, Qt, QObject
 from PyQt6.QtGui import QKeySequence, QShortcut, QIcon
+from PyQt6.QtWebChannel import QWebChannel
 from pynput import keyboard
 from rich.console import Console
 from .config import ICON_PATH, DEFAULT_SHORTCUT
@@ -10,6 +11,11 @@ from .utils import load_config, save_config
 import pyperclip
 
 console = Console()
+
+class WebViewBridge(QObject):
+    """Pont pour la communication entre le Web et l'application."""
+    clipboard_text_signal = pyqtSignal(str)
+
 class MainWindow(QMainWindow):
     toggle_signal = pyqtSignal()
 
@@ -25,6 +31,13 @@ class MainWindow(QMainWindow):
         self.port = port
         self.clipboard_last_content = pyperclip.paste()
 
+        # Créer un pont pour la communication Web
+        self.web_bridge = WebViewBridge()
+
+        # Setup web channel
+        self.web_channel = QWebChannel(self.web.page())
+        self.web.page().setWebChannel(self.web_channel)
+        self.web_channel.registerObject('pywebview', self.web_bridge)
 
         try:
             self.setup_keyboard_listener()
@@ -128,20 +141,16 @@ class MainWindow(QMainWindow):
         else:
             # Récupérer le contenu du presse-papiers
             clipboard_content = pyperclip.paste()
-            if isinstance(clipboard_content, str) and len(clipboard_content) > 0 and clipboard_content != self.clipboard_last_content:
+            if isinstance(clipboard_content, str) and len(clipboard_content) > 0 and clipboard_content != self.clipboard_last_content and len(clipboard_content) < 2000:
                 self.clipboard_last_content = clipboard_content
-                # Encoder le contenu pour l'URL
-                encoded_text = QUrl.toPercentEncoding(clipboard_content)
-
-                # Mettre à jour l'URL avec le texte du presse-papiers
-                new_url = QUrl(f"http://127.0.0.1:{self.port}/?text={encoded_text}")
-                self.web.setUrl(new_url)
-
-            # Afficher la fenêtre
-            self.show()
-            self.activateWindow()
-            self.raise_()
-            self.is_visible = True
+                # Envoyer le texte du presse-papiers via un signal
+                self.web_bridge.clipboard_text_signal.emit(clipboard_content)
+            else:
+                # Afficher la fenêtre sans changement du presse-papiers
+                self.show()
+                self.activateWindow()
+                self.raise_()
+                self.is_visible = True
 
     def closeEvent(self, event):
         """Gère l'événement de fermeture."""

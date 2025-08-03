@@ -11,6 +11,11 @@ def main():
     if sys.platform.startswith('linux'):
         import os
         os.environ["QT_QPA_PLATFORM"] = "xcb"
+    # Configuration pour Windows
+    #elif sys.platform.startswith('win32'):
+    else:
+        import os
+        os.environ["QT_QPA_PLATFORM"] = "windows:darkmode=0"
 
     # Initialisation du serveur Flask
     port = find_free_port()

@@ -7,8 +7,8 @@
             --border-color: #e5e7eb;
         }
 
-        /* Thème sombre */
-        :root[data-theme="dark"] {
+        /* Thème sombre (non-glass) */
+        :root[data-theme="dark"]:not([data-theme*="glass"]) {
             --bg-primary: #1f2937;
             --bg-secondary: #111827;
             --text-primary: #f9fafb;
