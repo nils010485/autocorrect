@@ -42,8 +42,8 @@ Le plus cool ? Vous gardez le contrôle total avec vos propres clés API !
 
 ```bash
 # On clone le projet
-git clone https://github.com/yourusername/ai-autocorrect.git
-cd ai-autocorrect
+git clone https://github.com/nils010485/autocorrect.git
+cd autocorrect
 
 # On crée notre environnement Python
 python3.11 -m venv venv
@@ -60,8 +60,14 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### 🤔 Option: Je suis à l'aise avec Python  
-J'aurais aimé vous permettre d'installer l'application avec pip, mais pour l'instant ce n'est pas le cas (je rendrai tout ça compatible bientôt ou vous pouvez faire une PR si vous voulez m'aider).  
+### 🤔 Option: Je suis à l'aise avec Python
+```bash
+# Installation via pip (après avoir cloné le repo)
+pip install --editable .
+
+# Lancement direct
+ai-autocorrect
+```  
 
 ## 🗂️ Structure python du projet
 
@@ -102,7 +108,7 @@ Voici les améliorations prévues pour AI AUTOCORRECT :
 - [ ] Refactorisation complète du code pour plus de clarté et de maintenabilité
 - [ ] Centralisation des ressources dans une structure plus cohérente
 - [ ] Migration des CDN vers des ressources statiques locales pour une meilleure fiabilité
-- [ ] Préparation du code pour une distribution via pip
+- [x] Préparation du code pour une distribution via pip
 
 ### 🌍 Internationalisation
 - [ ] Support multilingue complet de l'interface
@@ -148,6 +154,6 @@ Pour voir le texte complet de la licence : [CC BY-NC 4.0](https://creativecommon
 
 <p align="center">
   Made with ❤️ by Nils<br>
-  © 2022-2025 AI AUTOCORRECT
+  © 2022-2024 AI AUTOCORRECT
 </p>
 

@@ -74,10 +74,8 @@
 
 
 {% block content %}
-    <!-- Contenu principal réorganisé -->
     <main class="container mx-auto px-4 pt-20 pb-8">
         <div class="max-w-4xl mx-auto theme-card rounded-xl shadow-sm overflow-hidden">
-            <!-- Navigation par onglets améliorée -->
             <div class="border-b border-indigo-500/20 mb-6">
                 <nav class="flex">
                     <button id="tabCustom" class="tab-button active flex-1">
@@ -89,9 +87,7 @@
                 </nav>
             </div>
 
-            <!-- Section des modes personnalisés (active par défaut) -->
             <div id="customModeSection" class="p-6">
-                <!-- Formulaire de création en premier -->
                 <div class="mb-8">
                     <h2 class="text-xl font-semibold mb-4 flex items-center text-blue-900">
                         <i class="fas fa-plus-circle text-blue-700 mr-2"></i>
@@ -100,7 +96,6 @@
                     
                     <form id="customModeForm">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Titre -->
                             <div>
                                 <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
                                     Titre du mode*
@@ -110,21 +105,18 @@
                                     placeholder="Ex: Simplifier">
                             </div>
 
-                            <!-- Icône -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
                                     Icône*
                                 </label>
                                 <div id="iconGrid" class="grid grid-cols-5 gap-2 p-3 border border-[var(--border-color)] rounded-lg bg-[var(--input-bg)]">
                                     <div class="contents">
-                                        <!-- Les icônes seront injectées ici -->
                                     </div>
                                 </div>
                                 <input type="hidden" id="selectedIconInput" name="icon" required>
                             </div>
                         </div>
 
-                        <!-- Prompt -->
                         <div class="mt-6">
                             <label for="prompt" class="block text-sm font-medium text-gray-700 mb-2">
                                 Instructions pour l'IA*
@@ -135,7 +127,6 @@
                             <p class="text-xs text-gray-500 mt-1">Utilisez des instructions claires et concises</p>
                         </div>
 
-                        <!-- Boutons -->
                         <div class="flex space-x-4 mt-6">
                             <button type="submit"
                                     class="flex-1 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors flex items-center justify-center">
@@ -149,21 +140,17 @@
                     </form>
                 </div>
 
-                <!-- Liste des modes existants -->
                 <div class="mt-10">
                     <h2 class="text-xl font-semibold mb-4 flex items-center text-blue-900">
                         <i class="fas fa-list text-blue-700 mr-2"></i>
                         Modes existants
                     </h2>
                     <div id="modesList" class="space-y-4">
-                        <!-- Les modes seront injectés ici via JavaScript -->
                     </div>
                 </div>
             </div>
 
-            <!-- Section de réorganisation des modes (cachée par défaut) -->
             <div id="orderModeSection" class="hidden p-6">
-                <!-- Instructions -->
                 <div class="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
                     <div class="flex items-start">
                         <i class="fas fa-info-circle text-indigo-500 mt-1 mr-3"></i>
@@ -174,12 +161,9 @@
                     </div>
                 </div>
 
-                <!-- Liste des modes pour réorganisation -->
                 <div id="orderModesList" class="space-y-3">
-                    <!-- Les modes seront injectés ici via JavaScript -->
                 </div>
 
-                <!-- Bouton de sauvegarde visible seulement dans cet onglet -->
                 <div class="mt-6 flex justify-end">
                     <button id="saveOrderBtn" class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center">
                         <i class="fas fa-save mr-2"></i>Sauvegarder l'ordre

@@ -1,48 +1,52 @@
 import json
+import logging
 import socket
 import sys
 import os
-from typing import Dict, Optional
 from rich.console import Console
 from .config import CONFIG_FILE, CONFIG_DIR, DEFAULT_CONFIG, CUSTOM_MODES_SCHEMA, \
     MODES
-from typing import Tuple
 
 console = Console()
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-def validate_audio_file(file_path: str) -> Tuple[bool, str]:
+
+def validate_audio_file(file_path: str) -> tuple[bool, str]:
     """
-    Valide un fichier audio.
+    Validates an audio file.
 
     Args:
-        file_path: Chemin vers le fichier audio
+        file_path: Path to the audio file
 
     Returns:
-        Tuple[bool, str]: (est_valide, message_erreur)
+        tuple[bool, str]: (is_valid, error_message)
     """
-    # Extensions autorisées
     ALLOWED_EXTENSIONS = {'flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'oga', 'ogg', 'wav', 'webm'}
     MAX_SIZE_MB = 25
 
-    # Vérifier si le fichier existe
     if not os.path.exists(file_path):
         return False, "Fichier audio non trouvé."
 
-    # Vérifier l'extension
     extension = os.path.basename(file_path).lower().split('.')[-1]
     if extension not in ALLOWED_EXTENSIONS:
         return False, f"Format de fichier non supporté. Formats acceptés: {', '.join(ALLOWED_EXTENSIONS)}"
 
-    # Vérifier la taille
-    file_size_mb = os.path.getsize(file_path) / (1024 * 1024)  # Convertir en MB
+    file_size_mb = os.path.getsize(file_path) / (1024 * 1024)
     if file_size_mb > MAX_SIZE_MB:
         return False, f"Le fichier est trop volumineux. Taille maximale: {MAX_SIZE_MB}MB"
 
     return True, ""
 
 def find_free_port() -> int:
-    """Trouve un port disponible sur le système."""
+    """
+    Finds a free port on the system.
+
+    Returns:
+        int: Available port number
+    """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind(('', 0))
         s.listen(1)
@@ -50,36 +54,65 @@ def find_free_port() -> int:
         return port
 
 def restart_application():
-    """Redémarre l'application."""
+    """
+    Restarts the application.
+
+    This function restarts the current application by replacing the
+    current process with a new instance using the same arguments.
+    """
     console.print("[bold blue]Redémarrage de l'application pour appliquer les changements de raccourci...[/bold blue]")
     python = sys.executable
     os.execl(python, python, *sys.argv)
 
 def ensure_config_dir() -> None:
-    """Assure que le répertoire de configuration existe."""
+    """
+    Ensures that the configuration directory exists.
+
+    Creates the configuration directory if it doesn't exist.
+    """
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
-def load_config() -> dict:
-    """Charge la configuration depuis le fichier JSON."""
+def load_config() -> dict[str, any]:
+    """
+    Loads configuration from the JSON file.
+
+    Returns:
+        dict[str, any]: Configuration dictionary with defaults applied
+    """
     try:
         if CONFIG_FILE.exists():
             with open(CONFIG_FILE, 'r') as f:
                 config = json.load(f)
-                # Assurez-vous que toutes les clés nécessaires sont présentes
                 for key, value in DEFAULT_CONFIG.items():
                     if key not in config:
-                        if key == 'custom_endpoint':
-                            config[key] = {'url': '', 'model_name': ''}
-                        else:
-                            config[key] = value
+                        config[key] = value
+
+                if 'custom_endpoint' in config:
+                    if 'style' not in config['custom_endpoint']:
+                        config['custom_endpoint']['style'] = 'openai'
+
                 return config
     except Exception as e:
-        print(f"Erreur lors de la lecture de la configuration: {e}")
+        logger.error(f"Erreur lors de la lecture de la configuration: {e}")
     return DEFAULT_CONFIG.copy()
 
-def save_config(api_key=None, model=None, theme=None, last_version=None,
-                shortcut=None, modes=None, custom_endpoint=None) -> bool:
-    """Sauvegarde la configuration dans le fichier JSON."""
+def save_config(api_key: str | None = None, model: str | None = None, theme: str | None = None, last_version: int | None = None,
+                shortcut: str | None = None, modes: dict | None = None, custom_endpoint: dict | None = None) -> bool:
+    """
+    Saves configuration to the JSON file.
+
+    Args:
+        api_key: API key for authentication
+        model: AI model name
+        theme: UI theme name
+        last_version: Last version used
+        shortcut: Global shortcut key
+        modes: Dictionary of processing modes
+        custom_endpoint: Custom API endpoint configuration
+
+    Returns:
+        bool: True if save was successful, False otherwise
+    """
     try:
         config = load_config()
         if api_key is not None:
@@ -97,7 +130,6 @@ def save_config(api_key=None, model=None, theme=None, last_version=None,
         if custom_endpoint is not None:
             config['custom_endpoint'] = custom_endpoint
 
-        # Assurer que custom_endpoint existe toujours
         if 'custom_endpoint' not in config:
             config['custom_endpoint'] = {'url': '', 'model_name': ''}
 
@@ -105,38 +137,57 @@ def save_config(api_key=None, model=None, theme=None, last_version=None,
             json.dump(config, f, indent=2)
         return True
     except Exception as e:
-        print(f"Erreur lors de la sauvegarde de la configuration: {e}")
+        logger.error(f"Erreur lors de la sauvegarde de la configuration: {e}")
         return False
 
-def load_api_key() -> Optional[str]:
-    """Charge la clé API depuis le fichier de configuration."""
+def load_api_key() -> str | None:
+    """
+    Loads the API key from the configuration file.
+
+    Returns:
+        str | None: API key if found, None otherwise
+    """
     try:
         if CONFIG_FILE.exists():
             with open(CONFIG_FILE, 'r') as f:
                 config = json.load(f)
                 return config.get('api_key')
     except Exception as e:
+        logger.error(f"Erreur lors de la lecture de la clé API: {e}")
         console.print(f"[bold red]Erreur lors de la lecture de la clé API: {e}[/bold red]")
     return None
 
 def save_api_key(api_key: str) -> bool:
-    """Sauvegarde la clé API dans le fichier de configuration."""
+    """
+    Saves the API key to the configuration file.
+
+    Args:
+        api_key: API key to save
+
+    Returns:
+        bool: True if save was successful, False otherwise
+    """
     try:
         ensure_config_dir()
-        config = load_config()  # Charger la configuration existante
+        config = load_config()
         config['api_key'] = api_key
         with open(CONFIG_FILE, 'w') as f:
             json.dump(config, f, indent=2)
         return True
     except Exception as e:
+        logger.error(f"Erreur lors de la sauvegarde de la clé API: {e}")
         console.print(f"[bold red]Erreur lors de la sauvegarde de la clé API: {e}[/bold red]")
         return False
 
-def load_modes() -> dict:
-    """Charge les modes depuis la configuration."""
+def load_modes() -> dict[str, any]:
+    """
+    Loads modes from the configuration.
+
+    Returns:
+        dict[str, any]: Dictionary containing system and custom modes
+    """
     config = load_config()
     if 'modes' not in config:
-        # Initialiser avec les modes par défaut si aucun mode n'est configuré
         config['modes'] = {
             'system': MODES,
             'custom': {},
@@ -144,28 +195,32 @@ def load_modes() -> dict:
         }
         save_config(modes=config['modes'])
     else:
-        # Assurez-vous que les modes système sont toujours présents
         if 'system' not in config['modes']:
             config['modes']['system'] = MODES
         else:
-            # Mettre à jour les modes système existants
             for mode_id, mode_data in MODES.items():
                 if mode_id not in config['modes']['system']:
                     config['modes']['system'][mode_id] = mode_data
 
-        # Initialiser les modes personnalisés s'ils n'existent pas
         if 'custom' not in config['modes']:
             config['modes']['custom'] = {}
 
-        # S'assurer que l'ordre contient tous les modes
         if 'order' not in config['modes']:
             all_modes = {**config['modes']['system'], **config['modes']['custom']}
             config['modes']['order'] = list(all_modes.keys())
 
     return config['modes']
 
-def save_custom_mode(mode_data):
-    """Sauvegarde un nouveau mode personnalisé."""
+def save_custom_mode(mode_data: dict) -> bool:
+    """
+    Saves a new custom mode.
+
+    Args:
+        mode_data: Dictionary containing mode information
+
+    Returns:
+        bool: True if save was successful, False otherwise
+    """
     config = load_config()
     if 'modes' not in config:
         config['modes'] = CUSTOM_MODES_SCHEMA['modes']
@@ -183,20 +238,40 @@ def save_custom_mode(mode_data):
     config['modes']['order'].append(mode_id)
     return save_config(modes=config['modes'])
 
-def get_custom_endpoint() -> Dict[str, str]:
-    """Récupère la configuration de l'endpoint personnalisé."""
-    config = load_config()
-    return config.get('custom_endpoint', {'url': '', 'model_name': ''})
+def get_custom_endpoint() -> dict[str, str]:
+    """
+    Retrieves the custom endpoint configuration.
 
-def save_custom_endpoint(url: str, model_name: str) -> bool:
-    """Sauvegarde la configuration de l'endpoint personnalisé."""
+    Returns:
+        dict[str, str]: Custom endpoint configuration with url, model_name, and style
+    """
+    config = load_config()
+    endpoint = config.get('custom_endpoint', {'url': '', 'model_name': ''})
+    if 'style' not in endpoint:
+        endpoint['style'] = 'openai'
+    return endpoint
+
+def save_custom_endpoint(url: str, model_name: str, style: str = 'openai') -> bool:
+    """
+    Saves the custom endpoint configuration.
+
+    Args:
+        url: Custom API endpoint URL
+        model_name: Model name for custom endpoint
+        style: Endpoint style ('openai' or 'anthropic')
+
+    Returns:
+        bool: True if save was successful, False otherwise
+    """
     try:
         config = load_config()
         config['custom_endpoint'] = {
             'url': url.strip(),
-            'model_name': model_name.strip()
+            'model_name': model_name.strip(),
+            'style': style.strip()
         }
         return save_config(custom_endpoint=config['custom_endpoint'])
     except Exception as e:
+        logger.error(f"Erreur lors de la sauvegarde de l'endpoint personnalisé: {e}")
         console.print(f"[bold red]Erreur lors de la sauvegarde de l'endpoint personnalisé: {e}[/bold red]")
         return False

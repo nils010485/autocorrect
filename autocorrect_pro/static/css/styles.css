@@ -1,4 +1,4 @@
-/* ========== BASE STYLES ========== */
+
 :root {
   --bg-primary: #f8fafc;
   --bg-secondary: #ffffff;
@@ -17,7 +17,7 @@
   --transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* ========== DARK THEME ========== */
+
 [data-theme="dark"]:not([data-theme*="glass"]) {
   --bg-primary: #0f172a;
   --bg-secondary: #1e293b;
@@ -35,7 +35,7 @@
   --card-bg: #1e293b;
 }
 
-/* ========== GLOBAL STYLES ========== */
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.6;
@@ -48,17 +48,17 @@ body {
   font-smooth: always;
 }
 
-/* Special rules for glass themes */
+
 [data-theme*="glass"] body {
   background-color: transparent;
 }
 
-/* Smooth transitions for theme changes */
+
 * {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* ========== TYPOGRAPHY ========== */
+
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   letter-spacing: -0.025em;
@@ -69,7 +69,7 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-secondary);
 }
 
-/* ========== LAYOUT COMPONENTS ========== */
+
 .container {
   width: 100%;
   max-width: 1280px;
@@ -77,7 +77,7 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0 1rem;
 }
 
-/* ========== CARDS ========== */
+
 .theme-card {
   background-color: var(--card-bg);
   border-radius: 1rem;
@@ -92,7 +92,7 @@ h1, h2, h3, h4, h5, h6 {
               0 5px 10px -5px var(--shadow-color);
 }
 
-/* ========== BUTTONS ========== */
+
 button {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: center;
@@ -108,7 +108,7 @@ button:active:not(:disabled) {
   box-shadow: none;
 }
 
-/* ========== FORMS ========== */
+
 .floating-input {
   -webkit-appearance: none;
   appearance: none;
@@ -132,7 +132,7 @@ button:active:not(:disabled) {
   opacity: 0.7;
 }
 
-/* ========== ICONS ========== */
+
 .icon-button {
   display: inline-flex;
   align-items: center;
@@ -159,7 +159,7 @@ button:active:not(:disabled) {
   color: white;
 }
 
-/* ========== SIDEBAR ========== */
+
 .sidebar-transition {
   transition: transform 0.3s ease-in-out;
 }
@@ -172,7 +172,7 @@ button:active:not(:disabled) {
   transform: translateX(0);
 }
 
-/* ========== MODE BUTTONS ========== */
+
 .mode-button {
   display: flex;
   flex-direction: column;
@@ -204,7 +204,7 @@ button:active:not(:disabled) {
   box-shadow: 0 0 0 2px var(--indigo-primary);
 }
 
-/* ========== UTILITY CLASSES ========== */
+
 .hover-shadow:hover {
   box-shadow: 0 10px 15px -3px var(--shadow-color),
               0 4px 6px -2px var(--shadow-color);
@@ -220,7 +220,7 @@ button:active:not(:disabled) {
   background: rgba(30, 41, 59, 0.7);
 }
 
-/* ========== ANIMATIONS ========== */
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -248,7 +248,7 @@ button:active:not(:disabled) {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* ========== CUSTOM SCROLLBAR ========== */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -267,7 +267,7 @@ button:active:not(:disabled) {
   background: var(--text-secondary);
 }
 
-/* ========== PAGINATION CONTAINER ========== */
+
 .pagination-container {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-color);
@@ -299,7 +299,7 @@ button:active:not(:disabled) {
 }
 
 
-/* ========== HEADER & NAVIGATION ========== */
+
 header {
   background-color: var(--bg-secondary);
   border-bottom: 1px solid var(--border-color);
@@ -310,7 +310,7 @@ header {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* ========== SPINNER STYLES ========== */
+
 #loading.flex {
   display: flex;
   align-items: center;
@@ -362,7 +362,7 @@ header {
   filter: drop-shadow(0 0 1px var(--indigo-primary));
 }
 
-/* Positions des particules */
+
 .p1 { top: 0; left: 50%; transform: translateX(-50%); }
 .p2 { top: 25%; right: 10%; }
 .p3 { bottom: 25%; right: 10%; }
@@ -374,7 +374,7 @@ header {
   box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.8);
 }
 
-/* Animation des particules */
+
 .particle {
   animation: particlePulse 2s ease-in-out infinite;
 }
@@ -386,7 +386,7 @@ header {
 .p5 { animation-delay: 1.2s; }
 .p6 { animation-delay: 1.5s; }
 
-/* Lignes de connexion */
+
 .particles::before,
 .particles::after {
   content: '';
@@ -439,7 +439,7 @@ header {
   }
 }
 
-/* Effet de brillance */
+
 .network-loader::after {
   content: '';
   position: absolute;
@@ -457,7 +457,7 @@ header {
   50% { opacity: 0.6; }
 }
 
-/* Adaptation au thème sombre */
+
 [data-theme="dark"] .particle {
   background: var(--indigo-secondary);
   box-shadow: 0 0 8px var(--indigo-secondary);
@@ -477,7 +477,7 @@ header {
   background: radial-gradient(circle, rgba(129, 140, 248, 0.1) 0%, transparent 70%);
 }
 
-/* Effet de flou pour les particules */
+
 .particle::before {
   content: '';
   position: absolute;
@@ -492,7 +492,7 @@ header {
   opacity: 0.7;
 }
 
-/* ========== RESULT SECTION ========== */
+
 #result {
   border-radius: 1rem;
   box-shadow: 0 4px 6px -1px var(--shadow-color),
@@ -506,7 +506,7 @@ header {
   border: 1px solid var(--border-color);
 }
 
-/* ========== SWEETALERT CUSTOMIZATION ========== */
+
 .swal2-dark {
   background-color: #2d2d2d !important;
   color: #e0e0e0 !important;
@@ -532,13 +532,13 @@ header {
   border: none;
 }
 
-/* ========== DISABLED BUTTON STYLES ========== */
+
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-/* ========== MICROPHONE BUTTON ========== */
+
 .microphone-btn {
   transition: all 0.3s ease;
 }
@@ -551,7 +551,7 @@ button:disabled {
   transform: scale(0.95);
 }
 
-/* ========== RESPONSIVE ADJUSTMENTS ========== */
+
 @media (max-width: 768px) {
   .mode-button {
     padding: 1rem 0.5rem;
@@ -567,7 +567,7 @@ button:disabled {
   }
 }
 
-/* ========== DARK THEME SPECIFIC OVERRIDES ========== */
+
 [data-theme="dark"] body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
@@ -591,7 +591,7 @@ button:disabled {
   color: var(--text-primary) !important;
 }
 
-/* Ensure dropdown text is visible in glass-dark theme */
+
 [data-theme="glass-dark"] .floating-input,
 [data-theme="glass-dark"] select {
     color: #1e293b !important;
@@ -696,6 +696,6 @@ button:disabled {
 }
 
 
-/* ========== GLASS THEME CORE EFFECT ========== */
-/* Moved to glass-light.css and glass-dark.css for better control */
+
+
 

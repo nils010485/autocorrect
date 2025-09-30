@@ -1,16 +1,25 @@
+"""
+Entry point for pip installation.
+
+This module provides the main entry point when the package is installed
+via pip and contains the primary application initialization logic.
+"""
 import sys
 import threading
 from PyQt6.QtWidgets import QApplication
-from autocorrect_pro.utils import find_free_port
-from autocorrect_pro.gui import MainWindow
-from autocorrect_pro import create_app
+from .utils import find_free_port
+from .gui import MainWindow
+from . import create_app
 
-def main():
-    """Main entry point of the application.
-
-    Initializes the Qt GUI and Flask web server for the AI autocorrect application.
-    Sets up platform-specific configurations and starts the main event loop.
+def main() -> None:
     """
+Main entry point for the application.
+
+Initializes and starts the AI AutoCorrect application by:
+- Setting up platform-specific Qt configuration
+- Starting the Flask web server in a background thread
+- Launching the Qt GUI application
+"""
     if sys.platform.startswith('linux'):
         import os
         os.environ["QT_QPA_PLATFORM"] = "xcb"

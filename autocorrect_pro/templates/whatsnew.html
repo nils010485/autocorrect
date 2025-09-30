@@ -53,16 +53,18 @@
 {% block content %}
 <div class="min-h-screen flex items-center justify-center px-4">
     <div class="max-w-md w-full space-y-8 theme-card p-8 rounded-xl shadow-lg">
-        <!-- En-tête -->
         <div class="text-center">
             <h1 class="text-2xl font-bold text-indigo-600 flex items-center justify-center">
-                <i class="fas fa-bell mr-2"></i>Quoi de neuf ? v2.5.1
+                <i class="fas fa-bell mr-2"></i>Quoi de neuf ? v2.6.0
             </h1>
             <p class="mt-2 theme-text-secondary">Découvrez les dernières améliorations et corrections</p>
         </div>
 
-        <!-- Liste des nouveautés -->
         <ul class="space-y-4 theme-text-secondary">
+            <li class="flex items-start">
+                <i class="fas fa-robot text-indigo-500 mr-3"></i>
+                <span>Support des endpoints personnalisés compatibles Anthropic</span>
+            </li>
             <li class="flex items-start">
                 <i class="fas fa-paint-brush text-indigo-500 mr-3"></i>
                 <span>Amélioration des thèmes noir et glass dark</span>
@@ -89,7 +91,6 @@
             </li>
         </ul>
 
-        <!-- Bouton pour continuer -->
         <button onclick="window.location.href='/'"
                 class="w-full py-3 px-6 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors flex items-center justify-center mt-6">
             <i class="fas fa-arrow-right mr-2"></i>

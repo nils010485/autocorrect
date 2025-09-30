@@ -1,10 +1,13 @@
-# config.py
+"""
+Application configuration constants and settings.
+
+This module contains all configuration constants including AI models,
+processing modes, themes, and application settings.
+"""
 import os
 import sys
 from pathlib import Path
-from typing import Dict
 
-# Configuration des chemins
 if sys.platform == "win32":
     CONFIG_DIR = Path(os.getenv('APPDATA')) / "AutoCorrectPro"
 else:
@@ -14,11 +17,9 @@ CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = CONFIG_DIR / "gemini.json"
 ICON_PATH = Path(__file__).resolve().parent / 'static' / 'favicon.ico'
 
-# Configuration générale
-CURRENT_VERSION = 16
+CURRENT_VERSION = 17
 DEFAULT_SHORTCUT = "Ctrl+Space"
 
-# Configuration des modèles AI
 AVAILABLE_MODELS = {
     "gemini-1.5-flash": {
         "name": "Gemini Flash",
@@ -42,7 +43,6 @@ AVAILABLE_MODELS = {
     }
 }
 
-# Prompts prédéfinis
 MODES = {
     "traduire": {
         "title": "Traduire",
@@ -195,7 +195,8 @@ DEFAULT_CONFIG = {
     'shortcut': DEFAULT_SHORTCUT,
     'custom_endpoint': {
         'url': '',
-        'model_name': ''
+        'model_name': '',
+        'style': 'openai'
     }
 }
 

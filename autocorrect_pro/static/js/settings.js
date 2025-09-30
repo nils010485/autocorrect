@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (config.custom_endpoint) {
                 document.getElementById('customEndpointUrl').value = config.custom_endpoint.url || '';
                 document.getElementById('customEndpointModel').value = config.custom_endpoint.model_name || '';
+                document.getElementById('customEndpointStyle').value = config.custom_endpoint.style || 'openai';
             }
             
             // Afficher la section endpoint si nécessaire
@@ -97,6 +98,7 @@ function saveConfiguration() {
     const theme = document.getElementById('themeSelect').value;
     const customEndpointUrl = document.getElementById('customEndpointUrl').value;
     const customEndpointModel = document.getElementById('customEndpointModel').value;
+    const customEndpointStyle = document.getElementById('customEndpointStyle').value;
 
     // Envoyer les données au serveur
     fetch('/api/config', {
@@ -110,7 +112,8 @@ function saveConfiguration() {
             theme: theme,
             shortcut: shortcut,
             custom_endpoint_url: customEndpointUrl,
-            custom_endpoint_model: customEndpointModel
+            custom_endpoint_model: customEndpointModel,
+            custom_endpoint_style: customEndpointStyle
         })
     })
     .then(response => response.json())

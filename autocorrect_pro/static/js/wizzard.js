@@ -27,6 +27,7 @@ function validateAndNext() {
     if (selectedModel === 'custom') {
         const customEndpointUrl = document.getElementById('customEndpointUrl').value.trim();
         const customEndpointModel = document.getElementById('customEndpointModel').value.trim();
+        const customEndpointStyle = document.getElementById('customEndpointStyle').value;
 
         if (!customEndpointUrl || !customEndpointModel) {
             alert('Veuillez remplir tous les champs pour l\'endpoint personnalisé.');
@@ -124,6 +125,7 @@ document.getElementById('submitConfig').addEventListener('click', () => {
     if (selectedModel === 'custom') {
         config.custom_endpoint_url = document.getElementById('customEndpointUrl').value.trim();
         config.custom_endpoint_model = document.getElementById('customEndpointModel').value.trim();
+        config.custom_endpoint_style = document.getElementById('customEndpointStyle').value;
     }
 
     fetch('/api/config', {

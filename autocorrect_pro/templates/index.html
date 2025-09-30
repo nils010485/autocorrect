@@ -13,10 +13,8 @@
 
 {% block content %}
 
-<!-- Contenu principal -->
 <main class="container mx-auto px-4 pt-24 pb-12">
     <div class="max-w-3xl mx-auto">
-        <!-- Sélection du mode avec fond adapté au thème glass-dark -->
         <div class="mb-8 theme-card rounded-xl p-6 shadow-sm" data-aos="fade-up">
             <div class="flex justify-between items-center mb-4">
                 <label class="text-sm font-medium text-gray-700">Mode de traitement</label>
@@ -33,7 +31,6 @@
                 </div>
             </div>
 
-            <!-- Conteneur des modes -->
             <div id="modesContainer">
                 {% set modes_per_page = 4 %}
                 {% set total_modes = modes|length %}
@@ -60,7 +57,6 @@
         </div>
 
 
-        <!-- Zone de texte avec fond adapté au thème glass-dark -->
         <div class="theme-card rounded-xl p-6 shadow-sm mb-8" data-aos="fade-up" data-aos-delay="100">
             <label for="input_text" class="block text-sm font-medium text-indigo-200 mb-2">
                 <i class="fas fa-pen-fancy mr-2 text-indigo-400"></i>Texte à traiter
@@ -75,7 +71,6 @@
                     <i class="fas fa-microphone"></i>
                 </button>
 
-                <!-- Input file caché -->
                 <input type="file"
                        id="audio-file"
                        accept="audio/*"
@@ -90,7 +85,6 @@
             </button>
         </div>
 
-        <!-- Section de réponse -->
         <div id="response-section" class="bg-white rounded-xl p-6 shadow-sm mb-8 hidden" data-aos="fade-up"
              data-aos-delay="100">
             <label for="response_text" class="block text-sm font-medium text-gray-700 mb-2">
@@ -101,7 +95,6 @@
                       placeholder="Entrez votre réponse ici..."></textarea>
         </div>
 
-        <!-- Indicateur de chargement -->
         <div id="loading" class="hidden theme-card rounded-xl p-6 shadow-sm" data-aos="fade-up" data-aos-delay="300">
             <div class="flex items-center justify-center space-x-6">
                 <div class="network-loader">
@@ -121,7 +114,6 @@
             </div>
         </div>
 
-        <!-- Résultat amélioré (fond adapté au thème) -->
         <div id="result" class="hidden theme-card rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700" data-aos="fade-up" data-aos-delay="200">
             <div class="flex justify-between items-start mb-4">
                 <h2 class="text-lg font-semibold text-gray-800 dark:text-indigo-200 flex items-center">
@@ -134,7 +126,6 @@
             </div>
             <div id="result-text" class="prose max-w-none mb-6 text-gray-700 bg-gray-50 rounded-xl p-4 border border-gray-200"></div>
 
-            <!-- Boutons Copier et Retour -->
             <div id="result-buttons" class="flex space-x-3">
                 <button id="copy-button"
                         class="flex-1 px-4 py-3 bg-indigo-500 text-white rounded-xl hover:bg-indigo-600 transition-colors flex items-center justify-center shadow-md hover:shadow-lg">

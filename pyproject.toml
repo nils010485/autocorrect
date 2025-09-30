@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-autocorrect"
+version = "1.0.0"
+description = "AI-powered text correction and translation tool"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "CC BY-NC 4.0"}
+authors = [
+    {name = "Nils", email = "contact@nils.begou.dev"},
+]
+keywords = ["ai", "autocorrect", "translation", "text-processing", "nlp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: Creative Commons Attribution-NonCommercial 4.0 International",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Text Processing :: Linguistic",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "Flask>=3.0.2",
+    "google-generativeai",
+    "anthropic",
+    "openai",
+    "PyQt6>=6.8.1",
+    "PyQt6-Qt6>=6.8.2",
+    "PyQt6-WebEngine>=6.8.0",
+    "PyQt6-WebEngine-Qt6>=6.8.2",
+    "PyQt6_sip>=13.10.0",
+    "pyperclip>=1.9.0",
+    "rich",
+    "bs4",
+    "pynput",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+    "build",
+    "twine",
+]
+
+[project.urls]
+Homepage = "https://autocorrect.fieryaura.eu"
+Repository = "https://github.com/nils010485/autocorrect"
+Issues = "https://github.com/nils010485/autocorrect/issues"
+
+[project.scripts]
+ai-autocorrect = "autocorrect_pro.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["autocorrect_pro*"]
+
+[tool.setuptools.package-data]
+autocorrect_pro = ["static/**/*", "templates/**/*"]
