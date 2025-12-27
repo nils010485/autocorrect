@@ -1,5 +1,13 @@
+/**
+ * Current step tracker for wizard navigation
+ */
 let currentStep = 1;
 
+/**
+ * Navigate to next step in wizard
+ * @param {number} step - Step number to navigate to
+ * @description Hides all steps and shows the specified step
+ */
 function nextStep(step) {
     document.querySelectorAll('.fade-in').forEach(el => el.classList.add('hidden'));
     document.getElementById(`step${step}`).classList.remove('hidden');
@@ -7,10 +15,19 @@ function nextStep(step) {
     document.getElementById('currentStep').innerText = currentStep;
 }
 
+/**
+ * Navigate to previous step in wizard
+ * @param {number} step - Step number to navigate to
+ * @description Wrapper around nextStep for backward navigation
+ */
 function prevStep(step) {
     nextStep(step);
 }
 
+/**
+ * Validate configuration and proceed to final step
+ * @description Validates API key and custom endpoint configuration before proceeding
+ */
 function validateAndNext() {
     const apiKey = document.getElementById('apiKey').value.trim();
     const selectedModel = document.getElementById('modelSelect').value;
@@ -38,19 +55,25 @@ function validateAndNext() {
     nextStep(4);
 }
 
-// Fonction pour définir le thème
+/**
+ * Set theme for the application
+ * @param {string} theme - Theme name to apply
+ * @description Updates the document theme and saves to localStorage
+ */
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
 }
 
-// Charger le thème sauvegardé
+/**
+ * Initialize theme system and populate theme options
+ * @description Loads saved theme and populates theme select with all available options
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
     document.getElementById('themeSelect').value = savedTheme;
-            
-    // Ajouter les nouveaux thèmes s'ils ne sont pas déjà présents
+
     const themeSelect = document.getElementById('themeSelect');
     const newThemes = ['glass-light', 'glass-dark'];
     newThemes.forEach(theme => {
@@ -63,12 +86,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Écouteur pour le changement de thème
+/**
+ * Theme change handler
+ * @description Updates theme when user selects different theme option
+ */
 document.getElementById('themeSelect').addEventListener('change', (e) => {
     setTheme(e.target.value);
 });
 
-// Toggle visibilité clé API
+/**
+ * API key visibility toggle system
+ * @description Handles toggling API key input between password and text visibility
+ */
 const toggleApiKeyBtn = document.getElementById('toggleApiKey');
 const apiKeyInput = document.getElementById('apiKey');
 
@@ -78,7 +107,10 @@ toggleApiKeyBtn.addEventListener('click', () => {
     toggleApiKeyBtn.innerHTML = `<i class="fas fa-eye${type === 'password' ? '' : '-slash'}"></i>`;
 });
 
-// Gestion de l'affichage des champs d'endpoint personnalisé
+/**
+ * Custom endpoint configuration visibility
+ * @description Shows/hides custom endpoint fields based on model selection
+ */
 document.getElementById('modelSelect').addEventListener('change', function() {
     const customEndpointConfig = document.getElementById('customEndpointConfig');
     if (this.value === 'custom') {
@@ -88,7 +120,10 @@ document.getElementById('modelSelect').addEventListener('change', function() {
     }
 });
 
-// Gestion du raccourci clavier
+/**
+ * Keyboard shortcut input handler
+ * @description Captures and formats keyboard shortcut combinations
+ */
 const shortcutInput = document.getElementById('shortcutInput');
 shortcutInput.addEventListener('keydown', (event) => {
     event.preventDefault();
@@ -107,7 +142,10 @@ shortcutInput.addEventListener('keydown', (event) => {
     shortcutInput.value = keys.join('+');
 });
 
-// Soumission du formulaire
+/**
+ * Configuration form submission handler
+ * @description Processes and saves configuration data to server API
+ */
 document.getElementById('submitConfig').addEventListener('click', () => {
     const apiKey = apiKeyInput.value.trim();
     const selectedModel = document.getElementById('modelSelect').value;
@@ -121,7 +159,6 @@ document.getElementById('submitConfig').addEventListener('click', () => {
         shortcut: shortcut
     };
 
-    // Utiliser la même structure que dans index.html
     if (selectedModel === 'custom') {
         config.custom_endpoint_url = document.getElementById('customEndpointUrl').value.trim();
         config.custom_endpoint_model = document.getElementById('customEndpointModel').value.trim();
@@ -144,7 +181,6 @@ document.getElementById('submitConfig').addEventListener('click', () => {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
         alert('Erreur lors de la sauvegarde de la configuration');
     });
 });

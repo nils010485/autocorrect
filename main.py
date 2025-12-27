@@ -1,6 +1,7 @@
 import sys
 import threading
 from PyQt6.QtWidgets import QApplication
+from waitress import serve
 from autocorrect_pro.utils import find_free_port
 from autocorrect_pro.gui import MainWindow
 from autocorrect_pro import create_app
@@ -20,7 +21,12 @@ def main():
 
     port = find_free_port()
     app = create_app()
-    flask_thread = threading.Thread(target=lambda: app.run(port=port, debug=False))
+
+    def run_waitress():
+        """Run Flask app with Waitress production server."""
+        serve(app, host='127.0.0.1', port=port, threads=6)
+
+    flask_thread = threading.Thread(target=run_waitress)
     flask_thread.daemon = True
     flask_thread.start()
 

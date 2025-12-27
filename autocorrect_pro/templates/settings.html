@@ -1,19 +1,8 @@
-{% extends "base.html" %} {% block head %}
-<script src="https://cdn.tailwindcss.com"></script>
-<link
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    rel="stylesheet"
-/>
-<link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
-/>
-<link
-    rel="shortcut icon"
-    href="{{ url_for('static', filename='favicon.ico') }}"
-/>
+{% extends "base.html" %}
+{% block head %}
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 {% endblock %}  {% block content %}
-<main class="container mx-auto px-4 pt-24 pb-12">
+<main class="container mx-auto px-4 pb-12">
     <div class="max-w-3xl mx-auto">
         <div class="space-y-6">
             <div
@@ -242,18 +231,17 @@
         </div>
     </div>
 </main>
-{% endblock %} {% block scripts %}
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+{% endblock %}
+
+{% block scripts %}
 <script src="{{ url_for('static', filename='js/settings.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Charger la configuration du comportement du presse-papiers
-        const savedBehavior = localStorage.getItem('clipboard_behavior');
+          const savedBehavior = localStorage.getItem('clipboard_behavior');
         if (savedBehavior) {
             document.getElementById('clipboardBehavior').value = savedBehavior;
         }
 
-        // Sauvegarder lors du clic sur le bouton de configuration
         document.getElementById('saveConfig').addEventListener('click', function() {
             const behavior = document.getElementById('clipboardBehavior').value;
             localStorage.setItem('clipboard_behavior', behavior);

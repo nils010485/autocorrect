@@ -1,30 +1,25 @@
-/* Glass Dark Theme - v10 (Contraste amélioré) */
 
 [data-theme="glass-dark"] .mode-button.active {
   box-shadow: 0 0 0 2px rgba(129, 140, 248, 0.8);
 }
 
 [data-theme="glass-dark"] {
-  /* Fond plus sombre pour un meilleur contraste */
   --bg-primary: transparent;
-  --bg-secondary: rgba(5, 10, 20, 0.95); 
+  --bg-secondary: rgba(5, 10, 20, 0.95);
   --card-bg: rgba(5, 10, 20, 0.97);
   --input-bg: rgba(8, 15, 30, 0.9);
   --border-color: rgba(50, 65, 90, 0.9);
   --hover-bg: rgba(45, 60, 90, 0.95);
-  /* Textes plus clairs pour un meilleur contraste */
   --text-primary: #f0f4f8;
   --text-secondary: #b8c8e0;
 }
 
-/* Fond du corps plus sombre */
 [data-theme="glass-dark"] body {
     background-image: linear-gradient(145deg, #040914 0%, #080e1f 100%);
     background-attachment: fixed;
     color: var(--text-primary);
 }
 
-/* Effet verre avec bordure plus visible */
 [data-theme="glass-dark"] .theme-card,
 [data-theme="glass-dark"] header,
 [data-theme="glass-dark"] .mode-button,
@@ -35,8 +30,6 @@
     border: 1px solid var(--border-color);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
 }
-
-/* Styles pour les boutons */
 [data-theme="glass-dark"] .mode-button > div {
     color: var(--text-primary) !important;
 }
@@ -45,7 +38,6 @@
     color: #a5b4fc !important;
 }
 
-/* Nouveau : Contraste amélioré pour les zones de texte */
 [data-theme="glass-dark"] .floating-input {
     background-color: var(--input-bg) !important;
     border: 1px solid var(--border-color) !important;
@@ -57,14 +49,56 @@
     border: 1px solid var(--border-color) !important;
 }
 
-/* Étiquette plus claire pour meilleur contraste */
 [data-theme="glass-dark"] label {
     color: var(--text-primary) !important;
 }
-
-/* Titre "Résultat" */
 [data-theme="glass-dark"] #result h2 {
     color: var(--text-primary);
+}
+
+[data-theme="glass-dark"] #pageIndicator {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+}
+
+[data-theme="glass-dark"] #customEndpointUrl,
+[data-theme="glass-dark"] #customEndpointModel,
+[data-theme="glass-dark"] #customEndpointStyle {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    color: #ffffff !important;
+}
+
+[data-theme="glass-dark"] #customEndpointUrl:focus,
+[data-theme="glass-dark"] #customEndpointModel:focus,
+[data-theme="glass-dark"] #customEndpointStyle:focus {
+    color: #ffffff !important;
+}
+
+[data-theme="glass-dark"] .text-blue-900,
+[data-theme="glass-dark"] .text-lg.font-semibold {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+[data-theme="glass-dark"] .text-gray-700,
+[data-theme="glass-dark"] .text-gray-600 {
+    color: #e0e7ff !important;
+}
+
+[data-theme="glass-dark"] .text-gray-800,
+[data-theme="glass-dark"] h3.text-gray-800,
+[data-theme="glass-dark"] .text-gray-900 {
+    color: #ffffff !important;
+}
+
+[data-theme="glass-dark"] .text-gray-600 {
+    color: #94a3b8 !important;
+}
+
+[data-theme="glass-dark"] .bg-blue-50 {
+    background-color: rgba(30, 41, 59, 0.8) !important;
+    border-color: rgba(59, 130, 246, 0.3) !important;
 }
 
 

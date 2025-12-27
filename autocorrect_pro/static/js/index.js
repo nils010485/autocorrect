@@ -1,45 +1,61 @@
-// Appliquer le thème immédiatement
+/**
+ * Initialize theme settings and apply immediately
+ * @description Sets up theme configuration using localStorage or defaults to light theme
+ */
 const savedTheme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', savedTheme);
 localStorage.setItem('theme', savedTheme);
 
-// Initialisation AOS
+/**
+ * Initialize Animate On Scroll library
+ * @description Configures AOS for smooth scroll animations with custom settings
+ */
 AOS.init({
     duration: 800,
     once: true,
     easing: 'ease-out-cubic'
 });
 
-// Initialisation du WebChannel
+/**
+ * Initialize WebChannel for desktop application integration
+ * @description Sets up communication bridge between JavaScript and Python backend
+ */
 let pywebview = null;
 
-new QWebChannel(qt.webChannelTransport, function (channel) {
-    pywebview = channel.objects.pywebview;
+if (typeof QWebChannel !== 'undefined' && typeof qt !== 'undefined' && qt.webChannelTransport) {
+    new QWebChannel(qt.webChannelTransport, function (channel) {
+        pywebview = channel.objects.pywebview;
 
-    // Connecter le signal clipboard_text_signal
-    pywebview.clipboard_text_signal.connect(function(clipboardText) {
-        // Afficher une alerte demandant si on veut écraser le texte
-        showAlert(
-            'Nouveau texte dans le presse-papiers',
-            'Voulez-vous écraser le texte actuel par le contenu du presse-papiers ?',
-            'question',
-            true
-        ).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('input_text').value = clipboardText;
-            }
+        pywebview.clipboard_text_signal.connect(function(clipboardText) {
+            showAlert(
+                'Nouveau texte dans le presse-papiers',
+                'Voulez-vous écraser le texte actuel par le contenu du presse-papiers ?',
+                'question',
+                true
+            ).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('input_text').value = clipboardText;
+                }
+            });
         });
     });
-});
+}
 
+/**
+ * Set theme for the application
+ * @param {string} theme - Theme name to apply
+ * @description Updates the document theme and saves to localStorage
+ */
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
 }
 
-// CHARGEMENT DU THEME
+/**
+ * Initialize theme loading and pagination system
+ * @description Sets up theme configuration from server and handles mode page navigation
+ */
 document.addEventListener('DOMContentLoaded', function () {
-    // Charger la configuration initiale
     fetch('/api/config')
         .then(response => response.json())
         .then(data => {
@@ -48,13 +64,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-    // Gestion de la pagination
     const pages = document.querySelectorAll('[id^="modePage"]');
     const totalPages = pages.length;
     document.getElementById('totalPages').textContent = totalPages;
 
     let currentPage = 1;
 
+    /**
+     * Update visibility of mode pages based on current page
+     * @description Shows current page and hides others, updates page counter
+     */
     function updatePageVisibility() {
         pages.forEach(page => {
             if (page.id === `modePage${currentPage}`) {
@@ -66,39 +85,54 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('currentPage').textContent = currentPage;
     }
 
-    document.getElementById('prevPage').addEventListener('click', () => {
-        currentPage = currentPage === 1 ? totalPages : currentPage - 1;
-        updatePageVisibility();
-    });
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
 
-    document.getElementById('nextPage').addEventListener('click', () => {
-        currentPage = currentPage === totalPages ? 1 : currentPage + 1;
-        updatePageVisibility();
-    });
+    if (prevPageBtn) {
+        prevPageBtn.addEventListener('click', () => {
+            currentPage = currentPage === 1 ? totalPages : currentPage - 1;
+            updatePageVisibility();
+        });
+    }
 
-    // Initialisation
+    if (nextPageBtn) {
+        nextPageBtn.addEventListener('click', () => {
+            currentPage = currentPage === totalPages ? 1 : currentPage + 1;
+            updatePageVisibility();
+        });
+    }
+
     updatePageVisibility();
 });
-// Sélection du mode
+/**
+ * Mode selection system
+ * @description Handles mode button clicks and manages response section visibility
+ */
 const modeButtons = document.querySelectorAll('.mode-button');
 const selectedModeInput = document.getElementById('selectedMode');
 
-modeButtons.forEach(button => {
-    button.addEventListener('click', () => {
-        modeButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
-        selectedModeInput.value = button.dataset.mode;
+if (modeButtons.length > 0 && selectedModeInput) {
+    modeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            modeButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            selectedModeInput.value = button.dataset.mode;
 
-        // Afficher ou masquer la section de réponse en fonction du mode
-        if (button.dataset.mode === 'repondre') {
-            document.getElementById('response-section').classList.remove('hidden');
-        } else {
-            document.getElementById('response-section').classList.add('hidden');
-        }
+            if (button.dataset.mode === 'repondre') {
+                const responseSection = document.getElementById('response-section');
+                if (responseSection) responseSection.classList.remove('hidden');
+            } else {
+                const responseSection = document.getElementById('response-section');
+                if (responseSection) responseSection.classList.add('hidden');
+            }
+        });
     });
-});
+}
 
-// Traitement du texte
+/**
+ * Text processing system
+ * @description Handles form submission, streaming responses, and result display
+ */
 const submitBtn = document.getElementById('submit-btn');
 const loading = document.getElementById('loading');
 const result = document.getElementById('result');
@@ -106,7 +140,8 @@ const resultText = document.getElementById('result-text');
 const copyButton = document.getElementById('copy-button');
 const inputText = document.getElementById('input_text');
 
-submitBtn.addEventListener('click', async function (e) {
+if (submitBtn) {
+    submitBtn.addEventListener('click', async function (e) {
     e.preventDefault();
     submitBtn.disabled = true;
     loading.classList.remove('hidden');
@@ -143,26 +178,19 @@ submitBtn.addEventListener('click', async function (e) {
 
             for (const line of lines) {
                 if (line.startsWith('data: ')) {
-                    const rawData = line.slice(6); // Get the raw data string
+                    const rawData = line.slice(6);
                     if (rawData === '[END]') {
                         submitBtn.disabled = false;
                         AOS.refresh();
                         document.getElementById('result-buttons').classList.remove('hidden');
-                        return; // Exit the loop
+                        return;
                     }
                     try {
-                        // Parse the JSON data received from the server
                         const jsonData = JSON.parse(rawData);
-                        console.log("Received data:", jsonData); // Now jsonData is the actual string
-
-                        // Replace \n with <br> for HTML rendering using the parsed string
                         const htmlContent = jsonData.replace(/\n/g, '<br>');
                         resultText.innerHTML = htmlContent;
 
                     } catch (e) {
-                        console.error("Failed to parse JSON data:", rawData, e);
-                        // Fallback for non-JSON data (like the error message or [END])
-                        // or if the server didn't send JSON for some reason
                         const htmlContent = rawData.replace(/\n/g, '<br>');
                         resultText.innerHTML = htmlContent;
                     }
@@ -170,91 +198,110 @@ submitBtn.addEventListener('click', async function (e) {
             }
         }
     } catch (error) {
-        console.error('Fetch error:', error);
-        loading.classList.add('hidden');
-        submitBtn.disabled = false;
+        if (loading) loading.classList.add('hidden');
+        if (submitBtn) submitBtn.disabled = false;
         alert('Une erreur est survenue lors du traitement.');
     }
 });
+}
 
-// Gestion du bouton "Retour"
-document.getElementById('back-button').addEventListener('click', function () {
-    result.classList.add('hidden');
-    document.getElementById('result-buttons').classList.add('hidden');
-    inputText.value = resultText.textContent;
-    inputText.parentElement.classList.remove('hidden');
-    updateSubmitButton();
-});
+/**
+ * Handle back button functionality
+ * @description Restores input text from results and shows input area
+ */
+const backButton = document.getElementById('back-button');
+if (backButton) {
+    backButton.addEventListener('click', function () {
+        if (result) result.classList.add('hidden');
+        const resultButtons = document.getElementById('result-buttons');
+        if (resultButtons) resultButtons.classList.add('hidden');
+        if (inputText && resultText) inputText.value = resultText.textContent;
+        if (inputText && inputText.parentElement) inputText.parentElement.classList.remove('hidden');
+        updateSubmitButton();
+    });
+}
 
-// Gestion du bouton de fermeture
-document.getElementById('close-result').addEventListener('click', function () {
-    result.classList.add('hidden');
-    document.getElementById('result-buttons').classList.add('hidden');
-    inputText.parentElement.classList.remove('hidden');
-    updateSubmitButton();
-});
+/**
+ * Handle close result button functionality
+ * @description Closes result view and returns to input area
+ */
+const closeResultBtn = document.getElementById('close-result');
+if (closeResultBtn) {
+    closeResultBtn.addEventListener('click', function () {
+        if (result) result.classList.add('hidden');
+        const resultButtons = document.getElementById('result-buttons');
+        if (resultButtons) resultButtons.classList.add('hidden');
+        if (inputText && inputText.parentElement) inputText.parentElement.classList.remove('hidden');
+        updateSubmitButton();
+    });
+}
 
-// Copie dans le presse-papiers
-copyButton.addEventListener('click', function () {
-// --- MODIFICATION ICI ---
-// 1. Récupérer le contenu HTML de la zone de résultat
-const resultHtml = resultText.innerHTML;
+/**
+ * Copy to clipboard functionality
+ * @description Converts HTML content to plain text and copies to clipboard via server API
+ */
+if (copyButton) {
+    copyButton.addEventListener('click', function () {
+        if (!resultText) return;
 
-// 2. Remplacer toutes les occurrences de <br> (et ses variantes) par \n
+        const resultHtml = resultText.innerHTML;
+        const textToCopy = resultHtml.replace(/<br\s*\/?>/gi, '\n');
 
-//    Le regex /<br\s*\/?>/gi gère <br>, <br/>, <br />, insensible à la casse (i) et globalement (g)
-const textToCopy = resultHtml.replace(/<br\s*\/?>/gi, '\n');
-// --- FIN MODIFICATION ---
-
-console.log("Text being sent to /copy:", JSON.stringify(textToCopy)); // Pour déboguer
-
-fetch('/copy', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ text: textToCopy }) // Envoie le texte avec les \n reconstruits
-})
-.then(response => response.json())
-.then(data => {
-    if (data.success) {
-        copyButton.innerHTML = '<i class="fas fa-check mr-2"></i>Copié !';
+        fetch('/copy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text: textToCopy })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                copyButton.innerHTML = '<i class="fas fa-check mr-2"></i>Copié !';
+                setTimeout(() => {
+                    copyButton.innerHTML = '<i class="fas fa-copy mr-2"></i>Copier';
+            }, 2000);
+        } else {
+            copyButton.innerHTML = '<i class="fas fa-times mr-2"></i>Erreur';
+            setTimeout(() => {
+                copyButton.innerHTML = '<i class="fas fa-copy mr-2"></i>Copier';
+            }, 2000);
+        }
+    })
+    .catch(error => {
+        copyButton.innerHTML = '<i class="fas fa-times mr-2"></i>Erreur';
         setTimeout(() => {
             copyButton.innerHTML = '<i class="fas fa-copy mr-2"></i>Copier';
         }, 2000);
-    } else {
-        console.error("Copy failed:", data.error);
-        copyButton.innerHTML = '<i class="fas fa-times mr-2"></i>Erreur';
-         setTimeout(() => {
-            copyButton.innerHTML = '<i class="fas fa-copy mr-2"></i>Copier';
-        }, 2000);
-    }
-})
-.catch(error => {
-     console.error("Copy request failed:", error);
-     copyButton.innerHTML = '<i class="fas fa-times mr-2"></i>Erreur';
-     setTimeout(() => {
-        copyButton.innerHTML = '<i class="fas fa-copy mr-2"></i>Copier';
-     }, 2000);
+    });
 });
-});
+}
 
-// Initialisation au chargement de la page
+/**
+ * Initialize default mode on page load
+ * @description Sets up default correction mode when page loads
+ */
 document.addEventListener('DOMContentLoaded', function () {
-    // Activation du mode "corriger" par défaut
     const defaultModeButton = document.querySelector('[data-mode="corriger"]');
     if (defaultModeButton) {
         defaultModeButton.classList.add('active');
     }
 });
 
-// On Alerte JS avec thème
+/**
+ * Show themed alert dialog
+ * @param {string} title - Alert title
+ * @param {string} text - Alert message
+ * @param {string} icon - Alert icon type
+ * @param {boolean} showCancelButton - Whether to show cancel button
+ * @returns {Promise} SweetAlert2 promise
+ * @description Displays themed alert with appropriate styling based on current theme
+ */
 function showAlert(title, text, icon, showCancelButton = false) {
     const isGlassTheme = document.documentElement.getAttribute('data-theme').includes('glass');
-    const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark' || 
+    const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark' ||
                        document.documentElement.getAttribute('data-theme') === 'glass-dark';
 
-    // Use default styles for glass themes
     if (isGlassTheme) {
         return Swal.fire({
             title: title,
@@ -268,7 +315,6 @@ function showAlert(title, text, icon, showCancelButton = false) {
         });
     }
 
-    // Use custom classes for non-glass themes
     return Swal.fire({
         title: title,
         text: text,
@@ -294,45 +340,68 @@ function showAlert(title, text, icon, showCancelButton = false) {
     });
 }
 
-// Utilisation pour une alerte de succès
+/**
+ * Show success alert helper
+ * @description Displays success message with predefined text
+ */
 function showSuccessAlert() {
     showAlert('Succès', 'Configuration sauvegardée avec succès !', 'success');
 }
 
-// Utilisation pour une alerte d'erreur
+/**
+ * Show error alert helper
+ * @description Displays error message with predefined text
+ */
 function showErrorAlert() {
     showAlert('Erreur', 'Erreur lors de la sauvegarde de la configuration', 'error');
 }
 
-document.getElementById('microphone-btn').addEventListener('click', function () {
-    // Vérifier d'abord si on utilise OpenAI
-    const modelSelect = document.getElementById('modelSelect');
-    const selectedProvider = modelSelect.options[modelSelect.selectedIndex].value;
+/**
+ * Microphone button click handler
+ * @description Validates OpenAI model usage and triggers audio file selection
+ */
+const microphoneBtn = document.getElementById('microphone-btn');
+if (microphoneBtn) {
+    microphoneBtn.addEventListener('click', function () {
+        const modelSelect = document.getElementById('modelSelect');
 
-    if (!selectedProvider.includes('gpt') && selectedProvider !== 'custom') {
-        showAlert(
-            'Fonctionnalité non disponible',
-            'La transcription audio nécessite une clé API OpenAI.',
-            'warning'
-        );
-        return;
-    }
+        if (!modelSelect) {
+            const audioFile = document.getElementById('audio-file');
+            if (audioFile) audioFile.click();
+            return;
+        }
 
-    document.getElementById('audio-file').click();
-});
+        const selectedProvider = modelSelect.options[modelSelect.selectedIndex].value;
 
+        if (!selectedProvider.includes('gpt') && selectedProvider !== 'custom') {
+            showAlert(
+                'Fonctionnalité non disponible',
+                'La transcription audio nécessite une clé API OpenAI.',
+                'warning'
+            );
+            return;
+        }
+
+        const audioFile = document.getElementById('audio-file');
+        if (audioFile) audioFile.click();
+    });
+}
+
+/**
+ * Handle audio file upload and transcription
+ * @param {HTMLInputElement} input - File input element containing audio file
+ * @description Processes audio file upload and handles transcription workflow
+ */
 function handleAudioFile(input) {
     if (input.files && input.files[0]) {
         const file = input.files[0];
 
-        // Créer un FormData pour envoyer le fichier
         const formData = new FormData();
         formData.append('audio', file);
 
-        // Montrer un indicateur de chargement
         Swal.fire({
             title: 'Transcription en cours',
-            text: 'Veuillez patienter pendant la transcription du fichier audio...', 
+            text: 'Veuillez patienter pendant la transcription du fichier audio...',
             icon: 'info',
             allowOutsideClick: false,
             showConfirmButton: false,
@@ -341,7 +410,6 @@ function handleAudioFile(input) {
             }
         });
 
-        // Envoyer le fichier au serveur
         fetch('/transcribe', {
             method: 'POST',
             body: formData
@@ -375,10 +443,14 @@ function handleAudioFile(input) {
     }
 }
 
-// Gestion de la suppression de la configuration
+/**
+ * Configuration deletion system
+ * @description Handles configuration reset with confirmation dialog
+ */
 const deleteConfigBtn = document.getElementById('deleteConfig');
 
-deleteConfigBtn.addEventListener('click', () => {
+if (deleteConfigBtn) {
+    deleteConfigBtn.addEventListener('click', () => {
     showAlert(
         'Êtes-vous sûr ?',
         "Cela supprimera votre clé API et réinitialisera le modèle.",
@@ -392,21 +464,16 @@ deleteConfigBtn.addEventListener('click', () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    api_key: '', // Réinitialiser la clé API
-                    model: 'gemini-1.5-flash' // Réinitialiser au modèle par défaut
+                    api_key: '',
+                    model: 'gemini-1.5-flash'
                 })
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Réinitialiser les champs
                         apiKeyInput.value = '';
                         document.getElementById('modelSelect').value = 'gemini-1.5-flash';
-
-                        // Fermer la sidebar
                         sidebar.classList.add('translate-x-full');
-
-                        // Potentiellement recharger la page pour montrer l'écran de configuration
                         window.location.reload();
                     } else {
                         Swal.fire({
@@ -418,7 +485,6 @@ deleteConfigBtn.addEventListener('click', () => {
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Erreur',
@@ -429,3 +495,4 @@ deleteConfigBtn.addEventListener('click', () => {
         }
     });
 });
+}

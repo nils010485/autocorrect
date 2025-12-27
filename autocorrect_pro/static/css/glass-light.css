@@ -1,11 +1,9 @@
-/* Glass Light Theme - v6 (Enhanced Colors) */
 
 [data-theme="glass-light"] .mode-button.active {
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.8);
 }
 
 [data-theme="glass-light"] {
-  /* Redefine base colors with transparency */
   --bg-primary: transparent;
   --bg-secondary: rgba(255, 255, 255, 0.6);
   --card-bg: rgba(255, 255, 255, 0.6);
@@ -14,13 +12,10 @@
   --hover-bg: rgba(241, 245, 249, 0.8);
 }
 
-/* Add a background to the body so the glass effect has something to blur */
 [data-theme="glass-light"] body {
     background-image: linear-gradient(120deg, #f0f2f5 0%, #e6e9ed 100%);
     background-attachment: fixed;
 }
-
-/* Apply glass effect to specific elements */
 [data-theme="glass-light"] .theme-card,
 [data-theme="glass-light"] header,
 [data-theme="glass-light"] .mode-button,

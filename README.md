@@ -1,159 +1,155 @@
-
-# 🤖 AI AUTOCORRECT
+# AI AUTOCORRECT
 
 ![AI AUTOCORRECT DEMO](https://autocorrect.fieryaura.eu/app.png)
 
-> Transformez votre façon d'écrire avec l'intelligence artificielle !
+> Transform your writing with artificial intelligence
 
-## 🎯 Un petit mot avant de commencer...
+## About
 
-Hey ! Je suis [Nils](https://nils.begou.dev), le créateur d'AI AUTOCORRECT. Je dois vous avouer quelque chose : le code n'est pas encore aussi propre que je le voudrais (vous savez, quand on est passionné, on code d'abord, on range après 😅). Si vous êtes développeur et que vous avez envie de m'aider à faire briller ce projet, vos PR sont plus que bienvenues !
+Hey! I'm [Nils](https://nils.begou.dev), the creator of AI AUTOCORRECT. I'll be honest - the code isn't as clean as I'd like it to be yet (you know how it is when you're passionate, you code first, organize later). If you're a developer and want to help make this project shine, your PRs are more than welcome!
 
-## ✨ Pourquoi AI AUTOCORRECT ?
+## Why AI AUTOCORRECT?
 
-Imaginez avoir un assistant personnel qui :
-- 🚀 Corrige vos textes instantanément (vraiment, en moins d'une seconde !)
-- 🌍 Traduit vos messages comme un natif
-- ✍️ Reformule vos idées pour qu'elles brillent
-- 🎩 Transforme vos brouillons en textes professionnels
-- 💡 Analyse et améliore votre style d'écriture
-- 🎤 Transcris tous vos audios en un clin d'œil
+Imagine having a personal assistant that:
+- Corrects your text instantly (really, in less than a second!)
+- Translates your messages like a native speaker
+- Rephrases your ideas to make them shine
+- Transforms your drafts into professional text
+- Analyzes and improves your writing style
+- Transcribes all your audio files in a flash
 
-## 🛠️ Comment ça marche ?
+## How it works
 
-AI AUTOCORRECT s'appuie sur les meilleurs modèles d'IA du marché :
-- 🧠 **Google Gemini** (gratuit !)
-- 🎯 **Anthropic Claude**
-- ⚡ **OpenAI GPT**
-- 🌬️ **Modèles locaux**
+AI AUTOCORRECT relies on the best AI models on the market:
+- **Google Gemini** (free!)
+- **Anthropic Claude**
+- **OpenAI GPT**
+- **Local models**
 
-Le plus cool ? Vous gardez le contrôle total avec vos propres clés API !
+The best part? You keep full control with your own API keys!
 
-## 🚀 Démarrez en 2 minutes
+## Get Started in 2 Minutes
 
-### 📦 Option "Je veux juste l'utiliser"
-1. Direction [autocorrect.fieryaura.eu](https://autocorrect.fieryaura.eu/)
-2. Téléchargez la version qui correspond à votre système
-3. Et c'est parti ! 
+### Option "I just want to use it"
+1. Go to [autocorrect.fieryaura.eu](https://autocorrect.fieryaura.eu/)
+2. Download the version for your system
+3. You're done!
 
-> 🐧 Utilisateurs Linux : N'oubliez pas d'installer `python3.11` et `python3.11-devel` !
+> Linux users: Don't forget to install `python3.11` and `python3.11-devel`!
 
-### 👨‍💻 Option "Je veux bidouiller"
+### Option "I want to tinker"
 
 ```bash
-# On clone le projet
+# Clone the project
 git clone https://github.com/nils010485/autocorrect.git
 cd autocorrect
 
-# On crée notre environnement Python
+# Create Python virtual environment
 python3.11 -m venv venv
 
-# On l'active (Linux/Mac)
+# Activate virtual environment
+# On Linux/Mac:
 source venv/bin/activate
-# ou (Windows)
+# On Windows:
 venv\Scripts\activate
 
-# On installe les dépendances
+# Install Python dependencies
 pip install -r requirements.txt
 
-# Et on lance !
+# Build frontend (optional - pre-built assets included)
+# Only needed if modifying Tailwind CSS
+npm install
+npm run build
+
+# Run the application
 python main.py
 ```
 
-### 🤔 Option: Je suis à l'aise avec Python
+### Option: I'm comfortable with Python
 ```bash
-# Installation via pip (après avoir cloné le repo)
+# Installation via pip (after cloning the repo)
 pip install --editable .
 
-# Lancement direct
+# Direct launch
 ai-autocorrect
-```  
+```
 
-## 🗂️ Structure python du projet
+## Frontend Build Process (For Developers)
+
+The application uses Tailwind CSS. Pre-built assets are included, so you don't need to build anything unless you're modifying styles.
+
+### Prerequisites
+- Node.js 18+ and npm
+
+### Build Commands
+```bash
+npm install      # Install dependencies
+npm run build    # Build CSS for production
+npm run dev      # Watch for changes during development
+```
+
+## Project Structure
 
 ```
 ai-autocorrect/
-├── 🔧 config.py      # Le cerveau de la configuration
-├── 🖥️ gui.py         # L'interface qui fait tout briller
-├── 🤖 models.py      # La magie de l'IA
-├── 🛣️ routes.py      # Le traffic controller de l'app
-└── 🛠️ utils.py       # La boîte à outils
+├── autocorrect_pro/
+│   ├── config.py      # Configuration management
+│   ├── gui.py         # The interface that makes everything shine
+│   ├── models.py      # The AI magic
+│   ├── routes.py      # The traffic controller
+│   └── utils.py       # The toolbox
+├── static/
+│   ├── css/           # Stylesheets
+│   ├── js/            # JavaScript files
+│   └── vendor/        # Third-party libraries
+├── templates/         # Jinja2 templates
+└── main.py           # Application entry point
 ```
 
-## 🔒 Confidentialité avant tout !
+## Privacy First
 
-Votre vie privée, c'est sacré ! AI AUTOCORRECT :
-- Ne stocke AUCUNE donnée
-- Communique directement avec les API
-- Garde vos clés API en local
-- Ne fait pas de télémétrie
+Your privacy is sacred! AI AUTOCORRECT:
+- Stores NO data
+- Communicates directly with APIs
+- Keeps your API keys local
+- Does no telemetry
 
-## 🤝 Envie de contribuer ?
+## Contributing
 
-Que vous soyez développeur chevronné ou débutant enthousiaste, votre aide est précieuse ! Voici quelques façons de participer :
-- 🐛 Traquer les bugs
-- 💡 Proposer des fonctionnalités
-- 🧹 Nettoyer le code
-- 📝 Améliorer la documentation
+Whether you're a seasoned developer or an enthusiastic beginner, your help is precious! Here are some ways to participate:
+- Track bugs
+- Propose features
+- Clean up code
+- Improve documentation
 
-## 📫 Besoin d'aide ?
+## Need Help?
 
-- 🌟 Ouvrez une issue sur GitHub
-- 📧 Contactez-moi directement
-## 🗺️ Roadmap
+- Open an issue on GitHub
+- Contact me directly
 
-Voici les améliorations prévues pour AI AUTOCORRECT :
+## License
 
-### 🧹 Nettoyage & Architecture
-- [ ] Refactorisation complète du code pour plus de clarté et de maintenabilité
-- [ ] Centralisation des ressources dans une structure plus cohérente
-- [ ] Migration des CDN vers des ressources statiques locales pour une meilleure fiabilité
-- [x] Préparation du code pour une distribution via pip
+This project is under the **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)** license
 
-### 🌍 Internationalisation
-- [ ] Support multilingue complet de l'interface
-- [ ] Traduction des prompts et messages système
-- [ ] Détection automatique de la langue du système
+### What you can do:
+- Copy and redistribute the code
+- Modify and adapt the code
+- Use the project for personal use
 
-### 🔌 Backend & API
-- [ ] Migration vers l'endpoint OpenAI-compatible de Google (adieu la lib propriétaire !)
-- [ ] Intégration de nouveaux backends :
-  - [ ] OpenRouter
-  - [ ] LocalAI
-  - [ ] Autres fournisseurs d'IA
-- [ ] Interface unifiée pour tous les backends
+### Provided that you:
+- **Credit** the project and its author
+- **Do NOT** use it for commercial purposes
 
-### 🎯 En cours de réalisation
-#### 13/11/2024
-- [x] Interface utilisateur intuitive
-- [x] Support des principaux modèles d'IA
-- [x] Système de prompts personnalisables
+### What is prohibited:
+- Selling the code or a modified version
+- Using the code in a commercial project
+- Distributing the code without attribution
 
-> 💡 Vous avez des idées pour améliorer AI AUTOCORRECT ? N'hésitez pas à ouvrir une issue ou à proposer une PR !
+For the full license text: [CC BY-NC 4.0](https://creativecommons.org/by-nc/4.0/)
 
-## 📜 Licence
-
-Ce projet est sous licence **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**
-
-### Ce que vous pouvez faire :
-- ✅ Copier et redistribuer le code
-- ✅ Modifier et adapter le code
-- ✅ Utiliser le projet pour un usage personnel
-
-### À condition de :
-- 📝 **Créditer** le projet et son auteur (attribution)
-- 💰 **Ne pas** l'utiliser à des fins commerciales
-
-### Ce qui est interdit :
-- ❌ Vendre le code ou une version modifiée
-- ❌ Utiliser le code dans un projet commercial
-- ❌ Distribuer le code sans attribution
-
-Pour voir le texte complet de la licence : [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/)
 ---
 
 <p align="center">
   Made with ❤️ by Nils<br>
-  © 2022-2024 AI AUTOCORRECT
+  © 2022-2026 AI AUTOCORRECT
 </p>
-

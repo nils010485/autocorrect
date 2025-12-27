@@ -150,7 +150,7 @@ def copy() -> Response:
 
     try:
         soup = BeautifulSoup(html_or_plain_text, 'html.parser')
-        plain_text = soup.get_text()
+        plain_text = soup.get_text().strip()
 
         pyperclip.copy(plain_text)
         return jsonify({'success': True})

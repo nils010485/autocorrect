@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AutoCorrect Pro{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tailwind.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link id="theme-stylesheet" rel="stylesheet" href="{{ url_for('static', filename='css/' + (current_theme or 'light') + '.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/fontawesome/css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/sweetalert2/css/sweetalert2.min.css') }}">
     <script>
         (function() {
             let theme = localStorage.getItem('theme');
@@ -23,11 +24,12 @@
 <body class="bg-slate-50">
     {% include 'header.html' %}
 
-    <div class="container fade-in-up">
+    <div class="container fade-in-up" style="padding-top: 50px;">
         {% block content %}{% endblock %}
     </div>
 
     <script src="{{ url_for('static', filename='js/base.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/sweetalert2/js/sweetalert2.all.min.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

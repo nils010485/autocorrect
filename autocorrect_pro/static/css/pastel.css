@@ -1,30 +1,25 @@
-/* Pastel Theme - v3 (Improved Contrast) */
 
 [data-theme="pastel"] .mode-button.active {
   box-shadow: 0 0 0 2px #1e40af;
 }
 
 [data-theme="pastel"] {
-  /* Palette bleu pastel harmonisée */
   --bg-primary: transparent;
-  --bg-secondary: rgba(230, 240, 255, 0.85); /* Bleu très clair */
-  --card-bg: rgba(234, 245, 255, 0.85); /* Bleu pastel léger */
-  --input-bg: rgba(255, 255, 255, 0.9); /* Blanc légèrement transparent */
-  --border-color: rgba(175, 210, 255, 0.7); /* Bleu ciel pastel */
-  --hover-bg: rgba(200, 225, 255, 0.9); /* Bleu pastel plus soutenu */
-  --text-primary: #111827; /* Gris anthracite plus foncé pour meilleur contraste */
-  --icon-color: #1e40af; /* Bleu foncé pour les icônes */
-  --icon-hover: #1e3a8a; /* Bleu marine au survol */
+  --bg-secondary: rgba(230, 240, 255, 0.85);
+  --card-bg: rgba(234, 245, 255, 0.85);
+  --input-bg: rgba(255, 255, 255, 0.9);
+  --border-color: rgba(175, 210, 255, 0.7);
+  --hover-bg: rgba(200, 225, 255, 0.9);
+  --text-primary: #111827;
+  --icon-color: #1e40af;
+  --icon-hover: #1e3a8a;
 }
 
-/* Arrière-plan en dégradé bleu pastel */
 [data-theme="pastel"] body {
     background-image: linear-gradient(120deg, #e6f0ff 0%, #e6f7ff 50%, #f0f9ff 100%);
     background-attachment: fixed;
     color: var(--text-primary);
 }
-
-/* Effet de verre pour les éléments spécifiques */
 [data-theme="pastel"] .theme-card,
 [data-theme="pastel"] header,
 [data-theme="pastel"] .mode-button,
@@ -36,25 +31,21 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* Amélioration du contraste pour les icônes */
 [data-theme="pastel"] .icon-button {
     color: var(--icon-color);
 }
 [data-theme="pastel"] .icon-button:hover {
     color: var(--icon-hover);
 }
-
-/* Styles spécifiques pour la grille d'icônes */
 [data-theme="pastel"] #iconGrid {
     background-color: var(--input-bg);
     border-color: var(--border-color);
 }
 
-/* Amélioration du contraste pour les titres */
-[data-theme="pastel"] h1, 
-[data-theme="pastel"] h2, 
+[data-theme="pastel"] h1,
+[data-theme="pastel"] h2,
 [data-theme="pastel"] h3 {
-    color: #1e40af; /* Bleu foncé */
+    color: #1e40af;
 }
 
 .mode-button.active {

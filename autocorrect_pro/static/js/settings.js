@@ -1,15 +1,16 @@
+/**
+ * Initialize settings page
+ * @description Loads existing configuration and sets up event listeners
+ */
 document.addEventListener('DOMContentLoaded', function() {
-    // Charger la configuration existante
     fetch('/api/config')
         .then(response => response.json())
         .then(config => {
-            // Remplir les champs
             document.getElementById('apiKey').value = config.api_key || '';
             document.getElementById('modelSelect').value = config.model || 'gemini-1.5-flash';
             document.getElementById('shortcutInput').value = config.shortcut;
             document.getElementById('themeSelect').value = config.theme || 'light';
-            
-            // Ajouter les nouveaux thèmes s'ils ne sont pas déjà présents
+
             const themeSelect = document.getElementById('themeSelect');
             const newThemes = ['glass-light', 'glass-dark'];
             newThemes.forEach(theme => {
@@ -20,22 +21,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     themeSelect.appendChild(option);
                 }
             });
-            
-            // Remplir le endpoint personnalisé
+
             if (config.custom_endpoint) {
                 document.getElementById('customEndpointUrl').value = config.custom_endpoint.url || '';
                 document.getElementById('customEndpointModel').value = config.custom_endpoint.model_name || '';
                 document.getElementById('customEndpointStyle').value = config.custom_endpoint.style || 'openai';
             }
-            
-            // Afficher la section endpoint si nécessaire
+
             toggleCustomEndpoint(config.model);
         })
         .catch(error => {
             console.error('Erreur lors du chargement de la configuration:', error);
         });
 
-    // Basculer la visibilité de la clé API
+    /**
+     * API key visibility toggle handler
+     * @description Toggles API key input field between password and text modes
+     */
     document.getElementById('toggleApiKey').addEventListener('click', function() {
         const apiKeyInput = document.getElementById('apiKey');
         const type = apiKeyInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -43,35 +45,36 @@ document.addEventListener('DOMContentLoaded', function() {
         this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
     });
 
-    // Afficher/masquer l'endpoint personnalisé selon le modèle
+    /**
+     * Model selection change handler
+     * @description Shows/hides custom endpoint section based on selected model
+     */
     document.getElementById('modelSelect').addEventListener('change', function() {
         toggleCustomEndpoint(this.value);
     });
 
-    // Sauvegarder la configuration
     document.getElementById('saveConfig').addEventListener('click', saveConfiguration);
-
-    // Supprimer la configuration
     document.getElementById('deleteConfig').addEventListener('click', deleteConfiguration);
 
-    // Écouteur pour capturer les raccourcis clavier
+    /**
+     * Keyboard shortcut input handler
+     * @description Captures and formats keyboard shortcut combinations with special key handling
+     */
     document.getElementById('shortcutInput').addEventListener('keydown', function(e) {
         e.preventDefault();
         const keys = [];
-        
+
         if (e.ctrlKey) keys.push('Ctrl');
         if (e.altKey) keys.push('Alt');
         if (e.shiftKey) keys.push('Shift');
         if (e.metaKey) keys.push('Meta');
-        
-        // Ignorer les touches modificateurs seules
+
         if (!['Control', 'Alt', 'Shift', 'Meta'].includes(e.key)) {
             if (e.key === ' ') {
                 keys.push('Space');
             } else if (e.key.length === 1) {
                 keys.push(e.key.toUpperCase());
             } else {
-                // Gérer les touches spéciales
                 const specialKeys = {
                     'Escape': 'Esc', 'Tab': 'Tab', 'Enter': 'Enter',
                     'Backspace': 'Backspace', 'Delete': 'Delete',
@@ -80,17 +83,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 keys.push(specialKeys[e.key] || e.key);
             }
-            
+
             this.value = keys.join('+');
         }
     });
 });
 
+/**
+ * Toggle custom endpoint section visibility
+ * @param {string} model - Selected model name
+ * @description Shows custom endpoint configuration only when 'custom' model is selected
+ */
 function toggleCustomEndpoint(model) {
     const customSection = document.getElementById('customEndpointConfig');
     customSection.style.display = model === 'custom' ? 'block' : 'none';
 }
 
+/**
+ * Save configuration to server
+ * @description Collects form data and sends it to the server for storage
+ */
 function saveConfiguration() {
     const apiKey = document.getElementById('apiKey').value;
     const model = document.getElementById('modelSelect').value;
@@ -100,7 +112,6 @@ function saveConfiguration() {
     const customEndpointModel = document.getElementById('customEndpointModel').value;
     const customEndpointStyle = document.getElementById('customEndpointStyle').value;
 
-    // Envoyer les données au serveur
     fetch('/api/config', {
         method: 'POST',
         headers: {
@@ -119,9 +130,8 @@ function saveConfiguration() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Mettre à jour le thème dans le localStorage
             localStorage.setItem('theme', theme);
-            
+
             Swal.fire({
                 title: 'Succès!',
                 text: 'Configuration sauvegardée avec succès',
@@ -144,9 +154,13 @@ function saveConfiguration() {
     });
 }
 
+/**
+ * Delete/reset configuration
+ * @description Shows confirmation dialog and resets all configuration settings
+ */
 function deleteConfiguration() {
     Swal.fire({
-        title: 'Êtes-vous sûr?', 
+        title: 'Êtes-vous sûr?',
         text: "Cette action réinitialisera tous vos paramètres!",
         icon: 'warning',
         showCancelButton: true,
@@ -155,7 +169,6 @@ function deleteConfiguration() {
         confirmButtonText: 'Oui, réinitialiser!'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Envoyer une requête de suppression
             fetch('/api/config', {
                 method: 'POST',
                 headers: {

@@ -4,43 +4,40 @@ Application configuration constants and settings.
 This module contains all configuration constants including AI models,
 processing modes, themes, and application settings.
 """
+
 import os
 import sys
 from pathlib import Path
 
 if sys.platform == "win32":
-    CONFIG_DIR = Path(os.getenv('APPDATA')) / "AutoCorrectPro"
+    CONFIG_DIR = Path(os.getenv("APPDATA")) / "AutoCorrectPro"
 else:
     CONFIG_DIR = Path.home() / ".config"
 
 CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_FILE = CONFIG_DIR / "gemini.json"
-ICON_PATH = Path(__file__).resolve().parent / 'static' / 'favicon.ico'
+ICON_PATH = Path(__file__).resolve().parent / "static" / "favicon.ico"
 
-CURRENT_VERSION = 17
+CURRENT_VERSION = 25
 DEFAULT_SHORTCUT = "Ctrl+Space"
 
 AVAILABLE_MODELS = {
     "gemini-1.5-flash": {
-        "name": "Gemini Flash",
+        "name": "Gemini 2.5 Flash",
         "provider": "google",
-        "model_name": "gemini-2.0-flash"
+        "model_name": "gemini-2.5-flash",
     },
     "gpt-4o-mini": {
-        "name": "OpenAI GPT-4o Mini",
+        "name": "OpenAI GPT-5 Mini",
         "provider": "openai",
-        "model_name": "gpt-4o-mini"
+        "model_name": "gpt-5-mini-2025-08-07",
     },
     "claude-3-5-haiku-latest": {
-        "name": "Anthropic Claude3.5 Haiku",
+        "name": "Anthropic Claude 4.5 Haiku",
         "provider": "anthropic",
-        "model_name": "claude-3-5-haiku-latest"
+        "model_name": "claude-haiku-4-5",
     },
-    "custom": {
-        "name": "Autre modèle",
-        "provider": "custom",
-        "configurable": True
-    }
+    "custom": {"name": "Autre modèle", "provider": "custom", "configurable": True},
 }
 
 MODES = {
@@ -56,7 +53,7 @@ Format de sortie : Uniquement la traduction, sans commentaire ni texte original
 Message à traduire :""",
         "order": 1,
         "page": 1,
-        "system": True
+        "system": True,
     },
     "analyser": {
         "title": "Analyser",
@@ -71,7 +68,7 @@ Format : Réponse courte en points clés
 Message à analyser :""",
         "order": 2,
         "page": 1,
-        "system": True
+        "system": True,
     },
     "corriger": {
         "title": "Corriger",
@@ -86,7 +83,7 @@ Format de sortie : Uniquement le texte corrigé, sans commentaire
 Message à corriger :""",
         "order": 3,
         "page": 1,
-        "system": True
+        "system": True,
     },
     "professionaliser": {
         "title": "Professionaliser",
@@ -101,7 +98,7 @@ Format de sortie : Uniquement le message transformé
 Message à professionnaliser :""",
         "order": 4,
         "page": 2,
-        "system": True
+        "system": True,
     },
     "etendre": {
         "title": "Étendre",
@@ -116,7 +113,7 @@ Format de sortie : Uniquement le message étendu
 Message à étendre :""",
         "order": 5,
         "page": 2,
-        "system": True
+        "system": True,
     },
     "reformuler": {
         "title": "Reformuler",
@@ -132,7 +129,7 @@ Format de sortie : Uniquement le message reformulé
 Message à reformuler :""",
         "order": 6,
         "page": 2,
-        "system": True
+        "system": True,
     },
     "repondre": {
         "title": "Répondre",
@@ -167,7 +164,7 @@ Format de sortie :
 Réponse au message originel formatée et avec une bonne syntaxe uniquement, sans métadonnées ni explications""",
         "order": 7,
         "page": 3,
-        "system": True
+        "system": True,
     },
     "resumer": {
         "title": "Résumer",
@@ -182,31 +179,23 @@ Format de sortie : Uniquement le résumé
 Texte à résumer :""",
         "order": 8,
         "page": 3,
-        "system": True
-    }
+        "system": True,
+    },
 }
 
 
 DEFAULT_CONFIG = {
-    'api_key': None,
-    'model': 'gemini-1.5-flash',
-    'theme': 'light',
-    'last_version': 1,
-    'shortcut': DEFAULT_SHORTCUT,
-    'custom_endpoint': {
-        'url': '',
-        'model_name': '',
-        'style': 'openai'
-    }
+    "api_key": None,
+    "model": "gemini-1.5-flash",
+    "theme": "light",
+    "last_version": 1,
+    "shortcut": DEFAULT_SHORTCUT,
+    "custom_endpoint": {"url": "", "model_name": "", "style": "openai"},
 }
 
-AVAILABLE_THEMES = ['light', 'dark', 'glass-light', 'glass-dark', 'pastel']
+AVAILABLE_THEMES = ["light", "dark", "glass-light", "glass-dark", "pastel"]
 
 CUSTOM_MODES_SCHEMA = {
     "version": CURRENT_VERSION,
-    "modes": {
-        "system": MODES,
-        "custom": {},
-        "order": []
-    }
+    "modes": {"system": MODES, "custom": {}, "order": []},
 }

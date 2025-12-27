@@ -1,0 +1,17 @@
+{
+  "name": "ai-autocorrect",
+  "version": "2.6.1",
+  "description": "AI-powered text correction with PyQt6 GUI",
+  "scripts": {
+    "build:css": "npx tailwindcss -i ./src/css/input.css -o ./autocorrect_pro/static/css/tailwind.css --minify",
+    "watch:css": "npx tailwindcss -i ./src/css/input.css -o ./autocorrect_pro/static/css/tailwind.css --watch",
+    "build": "npm run build:css",
+    "dev": "npm run watch:css"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.0",
+    "postcss": "^8.4.0",
+    "autoprefixer": "^10.4.0"
+  },
+  "private": true
+}

@@ -1,5 +1,6 @@
 # Web Framework
 Flask==3.0.2
+Waitress==3.0.0
 
 # AI Services
 google-generativeai

@@ -1,5 +1,5 @@
-<header class="fixed top-0 left-0 right-0 bg-white shadow-md z-40 border-b border-gray-200 theme-card">
-    <div class="container mx-auto px-4 py-3">
+<header class="fixed top-0 left-0 right-0 bg-white shadow-md z-40 border-b border-gray-200 theme-card header-navbar">
+    <div class="mx-auto px-4 py-4" style="max-width: 95%; margin-left: auto; margin-right: auto;">
         <div class="flex justify-between items-center">
             <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
@@ -11,27 +11,27 @@
             </div>
             <nav class="flex items-center space-x-3">
                 <a href="{{ url_for('main.index') }}"
-                   class="p-2 rounded-lg hover:bg-gray-100 transition-colors nav-link"
+                   class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors nav-link"
                    data-path="{{ url_for('main.index') }}"
                    title="Accueil">
                     <i class="fas fa-home text-gray-600"></i>
                 </a>
                 <a href="{{ url_for('main.edit_order_page') }}"
-                   class="p-2 rounded-lg hover:bg-gray-100 transition-colors nav-link"
+                   class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors nav-link"
                    data-path="{{ url_for('main.edit_order_page') }}"
-                   title="Personnaliser les modes">
+                   title="Modes">
                     <i class="fas fa-pen-fancy text-gray-600"></i>
                 </a>
                 <a href="{{ url_for('main.settings_page') }}"
-                   class="p-2 rounded-lg hover:bg-gray-100 transition-colors nav-link"
+                   class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors nav-link"
                    data-path="{{ url_for('main.settings_page') }}"
                    title="Paramètres">
                     <i class="fas fa-cog text-gray-600"></i>
                 </a>
                 <a href="{{ url_for('main.whatsnew_page') }}"
-                   class="p-2 rounded-lg hover:bg-gray-100 transition-colors nav-link"
+                   class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors nav-link"
                    data-path="{{ url_for('main.whatsnew_page') }}"
-                   title="Quoi de neuf">
+                   title="Nouveautés">
                     <i class="fas fa-bell text-gray-600"></i>
                 </a>
             </nav>
