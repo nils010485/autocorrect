@@ -760,6 +760,203 @@ select {
   z-index: 1;
 }
 
+/* ===== SETTINGS PAGE STYLES ===== */
+
+/* Settings container theming */
+.settings-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sidebar navigation theming */
+.settings-nav-item {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.settings-nav-item:hover {
+  background-color: var(--hover-bg);
+}
+
+/* Mobile tabs theming */
+.settings-tab-item {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.settings-tab-item:hover {
+  background-color: var(--hover-bg);
+  color: var(--indigo-primary);
+}
+
+/* Settings item theming */
+.settings-item {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.settings-item-title {
+  color: var(--text-primary);
+}
+
+.settings-item-description {
+  color: var(--text-secondary);
+}
+
+/* Section header theming */
+.settings-section-title {
+  color: var(--text-primary);
+}
+
+.settings-section-description {
+  color: var(--text-secondary);
+}
+
+/* Input group button theming */
+.input-group button {
+  background-color: var(--input-bg);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.input-group button:hover {
+  background-color: var(--hover-bg);
+  color: var(--indigo-primary);
+}
+
+/* Info badge theming */
+.info-badge {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: var(--indigo-primary);
+}
+
+/* Dark theme specific overrides */
+[data-theme="dark"] .settings-nav-item {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .settings-nav-item:hover {
+  background-color: var(--hover-bg);
+  color: var(--indigo-primary);
+}
+
+[data-theme="dark"] .settings-tab-item {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .settings-tab-item:hover {
+  background-color: var(--hover-bg);
+  color: var(--indigo-primary);
+}
+
+[data-theme="dark"] .info-badge {
+  background-color: rgba(129, 140, 248, 0.15);
+  color: var(--indigo-primary);
+}
+
+/* Glass themes specific overrides */
+[data-theme*="glass"] .settings-nav-item {
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+}
+
+[data-theme*="glass"] .settings-tab-item {
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
+}
+
+[data-theme="glass-dark"] .settings-nav-item {
+  background-color: rgba(30, 41, 59, 0.8);
+  border-color: rgba(50, 65, 90, 0.9);
+  color: #b8c8e0;
+}
+
+[data-theme="glass-dark"] .settings-nav-item:hover {
+  background-color: rgba(45, 60, 90, 0.9);
+  color: #e0e7ff;
+}
+
+[data-theme="glass-dark"] .settings-tab-item {
+  background-color: rgba(30, 41, 59, 0.8);
+  border-color: rgba(50, 65, 90, 0.9);
+  color: #b8c8e0;
+}
+
+[data-theme="glass-dark"] .settings-tab-item:hover {
+  background-color: rgba(45, 60, 90, 0.9);
+  color: #e0e7ff;
+}
+
+[data-theme="glass-dark"] .settings-item-title,
+[data-theme="glass-dark"] .settings-section-title {
+  color: #f0f4f8;
+}
+
+[data-theme="glass-dark"] .settings-item-description,
+[data-theme="glass-dark"] .settings-section-description {
+  color: #b8c8e0;
+}
+
+[data-theme="glass-dark"] .info-badge {
+  background-color: rgba(129, 140, 248, 0.15);
+  color: #a5b4fc;
+}
+
+[data-theme="glass-dark"] .input-group button {
+  background-color: rgba(8, 15, 30, 0.9);
+  border-color: rgba(50, 65, 90, 0.9);
+  color: #b8c8e0;
+}
+
+[data-theme="glass-dark"] .input-group button:hover {
+  background-color: rgba(45, 60, 90, 0.9);
+  color: #e0e7ff;
+}
+
+[data-theme="glass-light"] .settings-nav-item,
+[data-theme="glass-light"] .settings-tab-item {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-color: rgba(255, 255, 255, 0.75);
+}
+
+[data-theme="glass-light"] .info-badge {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: var(--indigo-primary);
+}
+
+/* Pastel theme specific overrides */
+[data-theme="pastel"] .settings-nav-item,
+[data-theme="pastel"] .settings-tab-item {
+  background-color: rgba(234, 245, 255, 0.85);
+  border-color: rgba(175, 210, 255, 0.7);
+}
+
+[data-theme="pastel"] .settings-item-title,
+[data-theme="pastel"] .settings-section-title {
+  color: #1e40af;
+}
+
+[data-theme="pastel"] .settings-item-description,
+[data-theme="pastel"] .settings-section-description {
+  color: #475569;
+}
+
+[data-theme="pastel"] .info-badge {
+  background-color: rgba(30, 64, 175, 0.1);
+  color: #1e40af;
+}
+
+[data-theme="pastel"] .settings-nav-item:hover,
+[data-theme="pastel"] .settings-tab-item:hover {
+  background-color: rgba(200, 225, 255, 0.9);
+  color: #1e40af;
+}
+
 /* Theme navbar styles */
 [data-theme="dark"] .nav-item {
   color: var(--text-secondary);

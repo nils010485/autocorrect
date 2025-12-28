@@ -1,10 +1,16 @@
+import logging
+import os
 import sys
 import threading
+from pathlib import Path
+
 from PyQt6.QtWidgets import QApplication
 from waitress import serve
 from autocorrect_pro.utils import find_free_port
 from autocorrect_pro.gui import MainWindow
 from autocorrect_pro import create_app
+
+logger = logging.getLogger(__name__)
 
 def main():
     """Main entry point of the application.
@@ -37,4 +43,13 @@ def main():
     sys.exit(qt_app.exec())
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except ImportError:
+        logger.warning("Broken import cleaning metadata")
+        file_path = Path(__file__).resolve()
+        base_dir = file_path.parent
+        metadata_file = base_dir / "metadata.json"
+        if metadata_file.exists():
+            metadata_file.unlink()
+        sys.exit(1)

@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import tempfile
+import webbrowser
 
 from flask import Blueprint, render_template, request, jsonify, Response
 import pyperclip
@@ -318,6 +319,58 @@ def set_config() -> Response:
         'success': False,
         'error': 'Error during configuration save'
     }), 500
+
+
+@bp.route('/api/open-url', methods=['POST'])
+def open_url() -> Response:
+    """
+    Opens a URL in the system browser.
+
+    This endpoint is used to open external links (portfolio, project website)
+    in the default system browser. Only whitelisted domains are allowed.
+    """
+    try:
+        data = request.json
+        url = data.get('url')
+
+        if not url:
+            return jsonify({
+                'success': False,
+                'error': 'URL not provided'
+            }), 400
+
+        # Whitelist of allowed domains
+        allowed_domains = {
+            'nils.begou.dev',
+            'autocorrect.fieryaura.eu',
+            'www.autocorrect.fieryaura.eu'
+        }
+
+        # Extract domain from URL
+        from urllib.parse import urlparse
+        parsed_url = urlparse(url)
+        domain = parsed_url.netloc.lower()
+
+        # Remove www. prefix for comparison
+        if domain.startswith('www.'):
+            domain = domain[4:]
+
+        # Check if domain is in whitelist
+        if domain not in allowed_domains and parsed_url.netloc not in allowed_domains:
+            return jsonify({
+                'success': False,
+                'error': 'Domain not allowed'
+            }), 403
+
+        webbrowser.open(url)
+        return jsonify({'success': True})
+
+    except Exception as e:
+        logger.error(f"Error opening URL: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f'Error opening URL: {str(e)}'
+        }), 500
 
 
 @bp.route('/edit-order', methods=['GET'])
